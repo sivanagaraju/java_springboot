@@ -19,7 +19,6 @@ Every `explanation/*.md` uses whichever diagram type best represents the concept
 | `erDiagram` | `erDiagram` | JPA entity relationships, database schemas |
 | `classDiagram` | `classDiagram` | OOP hierarchies, interface trees, design patterns |
 | `stateDiagram-v2` | `stateDiagram-v2` | Bean lifecycle, circuit breaker states, thread states, order status |
-| `mindmap` | `mindmap` | Module/topic overview inside README and MINDMAP files |
 | `gitGraph` | `gitGraph` | Git branching strategies, version workflows |
 | `C4Context` | `C4Context` | System-level view: users, services, external systems |
 | `C4Container` | `C4Container` | Container view: Spring Boot app, DB, Redis, broker |
@@ -34,10 +33,11 @@ Every `explanation/*.md` uses whichever diagram type best represents the concept
 
 Each `.md` file annotation in the folder structure below shows the recommended Mermaid type(s) for that file.
 
-### Standard 2 — MINDMAP.md Files
+### Standard 2 — Markmap Files (VS Code Markmap)
 
-- Every **module** `README.md` contains an inline `mindmap` Mermaid diagram
+- Every **module** `README.md` must link to its respective `MINDMAP.md` (no inline mermaid)
 - Every **sub-topic** with 3+ distinct concepts gets a dedicated `MINDMAP.md` file
+- NOTE: Use pure Markdown lists for Markmaps. Do NOT use `mermaid` blocks.
 - Every **mini-project** gets a `MINDMAP.md` showing which concepts it exercises
 
 ### Standard 3 — Interview Questions

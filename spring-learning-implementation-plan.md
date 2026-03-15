@@ -44,7 +44,6 @@ Every explanation markdown file must include at least one Mermaid diagram. Use t
 | **erDiagram** | `erDiagram` | Database entity relationships, JPA mapping visualisation |
 | **classDiagram** | `classDiagram` | Class hierarchies, interface implementations, OOP relationships |
 | **stateDiagram-v2** | `stateDiagram-v2` | Bean lifecycle, circuit breaker states, thread states, order status |
-| **mindmap** | `mindmap` | Module overview, concept relationships, topic decomposition |
 | **gitGraph** | `gitGraph` | Git branching strategies, feature branch workflows |
 | **C4Context** | `C4Context` | System-level architecture: users / external systems / your system |
 | **C4Container** | `C4Container` | Container view: Spring Boot app / DB / Redis / Message broker |
@@ -73,77 +72,68 @@ sequenceDiagram
 
 ---
 
-### Standard 2 — Mindmap Files
+### Standard 2 — Markmap Files (VS Code Markmap)
+
+**IMPORTANT FORMATTING RULE**: Do NOT use `mermaid` codeblocks with `mindmap` for mindmaps. You MUST use pure Markdown lists with standard links (Markmap format) so that the VS Code Markmap extension can render them correctly.
 
 **Where to create a `MINDMAP.md`:**
 
-- Every module `README.md` must contain a `mindmap` diagram inline
+- Every module `README.md` must link to its respective `MINDMAP.md` (no inline mermaid)
 - Every sub-topic with 3+ distinct concepts gets a standalone `MINDMAP.md` file
 - Every mini-project gets a `MINDMAP.md` showing what concepts it uses
 
-**Template for `MINDMAP.md`:**
+**Template for `MINDMAP.md` (Pure Markdown Lists):**
 
 ````markdown
 # [Sub-topic Name] — Concept Mindmap
 
-```mermaid
-mindmap
-  root((Topic Name))
-    Branch 1
-      Leaf A
-      Leaf B
-        Detail B1
-    Branch 2
-      Leaf C
-      Leaf D
-    Branch 3
-      Leaf E
-```
+## `Module/Sub-topic Path`
+- **[`file-name.md`](explanation/file-name.md)** & **[`DemoFile.java`](explanation/DemoFile.java)**
+  - Concept 1
+    - Detail A
+    - Detail B
+  - Concept 2
+- **[`README.md`](exercises/README.md)**
+  - Practical Task 1
+  - Practical Task 2
 
-## What This Map Shows
-One paragraph explaining the branches and their relationships.
-
-## Recommended Reading Order
-1. Start at [Leaf A] → read `01-leaf-a.md`
-2. Then [Leaf B] → read `02-leaf-b.md`
-3. Leaf B1 depends on understanding B first
-```
+### Interview QA Focus
+- Key Question Topic 1
+- Key Question Topic 2
 ````
 
 **Example — Spring Security mindmap:**
 
 ````markdown
-```mermaid
-mindmap
-  root((Spring Security))
-    Filter Chain
-      15 Default Filters
-      Custom Filter Placement
-      OncePerRequestFilter
-    Authentication
-      UsernamePasswordFilter
-      AuthenticationManager
-      AuthenticationProvider
-      UserDetailsService
-    Authorization
-      URL Based
-        requestMatchers
-        antMatchers
-      Method Level
-        PreAuthorize
-        PostAuthorize
-    User Store
-      InMemory
-      JDBC
-      Custom UserDetailsService
-    Password
-      BCryptPasswordEncoder
-      DelegatingPasswordEncoder
-    Tokens
-      Session Cookie
-      JWT
-      OAuth2
-```
+# Spring Security
+
+## `07-spring-security`
+
+### `explanation/`
+- **[`01-architecture.md`](explanation/01-architecture.md)**
+  - Filter Chain
+    - 15 Default Filters
+    - Custom Filter Placement
+    - OncePerRequestFilter
+  - Authentication
+    - UsernamePasswordFilter
+    - AuthenticationManager
+    - AuthenticationProvider
+    - UserDetailsService
+  - Authorization
+    - URL Based
+      - requestMatchers
+      - antMatchers
+    - Method Level
+      - PreAuthorize
+      - PostAuthorize
+
+### `exercises/`
+- **[`Ex01_CustomFilter.java`](exercises/Ex01_CustomFilter.java)**
+
+### Interview QA Focus
+- BCrypt vs DelegatingPasswordEncoder
+- Session Cookie vs JWT vs OAuth2
 ````
 
 ---
