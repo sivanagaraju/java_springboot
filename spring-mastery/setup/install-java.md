@@ -1,6 +1,3 @@
-# Install Java (JDK 21)
+# install-java.md
 
-We use JDK 21 (LTS) for this course.
-
-Use SDKMAN! to install it:
-`sdk install java 21-tem`
+> JDK 21 via SDKMAN

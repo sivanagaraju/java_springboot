@@ -1,16 +1,15 @@
-# Spring Boot Learning Repository — Complete Folder Structure
+# Spring Boot Mastery — Complete Folder Structure (v2)
 
-> **Your Profile:** Python/FastAPI expert | Data Engineering background | 12 years industry | New Java/Spring closure
-> **Goal:** Production REST APIs, Microservices, Enterprise Architecture
-> **Style:** Learn by doing — every concept has explanation + working Java + ASCII diagrams + exercises
-
-This repository contains a full learning path for Spring Boot.
-Start with the [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) to understand the structure.
-Use the [PROGRESS_TRACKER.md](PROGRESS_TRACKER.md) to track your journey.
+> **Profile:** Python/FastAPI engineer | Data Engineering | 12 years industry | New Java/Spring closure
+> **Stack:** Java 21 + Spring Boot 3 + Spring Framework 6 + Gradle + PostgreSQL + Docker
+> **Philosophy:** Every concept explained via Python comparison → use case origin story → ASCII diagram → working code → mini-project
 
 ---
 
 ## How To Use This Repo Day-to-Day
+
+Start with the [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) to understand the structure.
+Use the [PROGRESS_TRACKER.md](PROGRESS_TRACKER.md) to track your journey.
 
 ### The learning loop for each topic
 
@@ -28,25 +27,12 @@ Use the [PROGRESS_TRACKER.md](PROGRESS_TRACKER.md) to track your journey.
 ### Terminal commands you'll use constantly
 
 ```bash
-# Start a new Spring Boot project (use Spring Initializr web UI, then)
-cd my-new-project && mvn spring-boot:run
+# Start a new Spring Boot project
+./gradlew bootRun
 
 # Run tests
-mvn test
-
-# Run a specific test class
-mvn test -Dtest=EmployeeControllerTest
+./gradlew test
 
 # Package
-mvn clean package
-
-# Run the jar directly
-java -jar target/myapp-0.0.1-SNAPSHOT.jar
-
-# View all Spring beans loaded
-# Add to main: ApplicationContext ctx = SpringApplication.run(...)
-# ctx.getBeanDefinitionNames() → print all
-
-# Watch logs in real time (after jar is running)
-tail -f logs/application.log
+./gradlew build
 ```

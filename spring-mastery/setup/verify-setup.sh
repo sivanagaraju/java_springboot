@@ -21,14 +21,15 @@ else
 fi
 echo ""
 
-# 2. Check Maven
-echo "[2/3] Checking Maven..."
-if command -v mvn >/dev/null 2>&1; then
-    MVN_VERSION=$(mvn -version 2>&1 | head -n 1)
-    echo "✅ Maven is installed."
-    echo "   $MVN_VERSION"
+# 2. Check Gradle
+echo "[2/3] Checking Gradle..."
+if command -v gradle >/dev/null 2>&1; then
+    GRADLE_VERSION=$(gradle --version | grep Gradle)
+    echo "✅ Gradle is installed."
+    echo "   $GRADLE_VERSION"
 else
-    echo "❌ Maven is NOT installed or not in PATH."
+    echo "❌ Gradle is NOT installed or not in PATH."
+    echo "   (You can use the ./gradlew wrapper provided in the repo instead)"
 fi
 echo ""
 

@@ -1,4 +1,3 @@
-# Install IntelliJ IDEA
+# install-intellij.md
 
-IntelliJ IDEA Community is the recommended IDE for Java development.
-You can download it for free from JetBrains' website.
+> IntelliJ setup + recommended plugins

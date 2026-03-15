@@ -1,3 +1,0 @@
-# 01-dispatcher-servlet.md
-
-> Full request lifecycle ASCII diagram
