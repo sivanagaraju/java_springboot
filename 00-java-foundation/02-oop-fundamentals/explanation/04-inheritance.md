@@ -1,92 +1,55 @@
-# 04 - Inheritance
+# Inheritance: Memory Structure and V-Tables
 
-> **Python Bridge:** Python supports Multiple Inheritance (`class Child(Parent1, Parent2):`). Java **strictly prohibits Multiple Inheritance** for classes to avoid the "Diamond Death Problem." A Java class can only inherit from exactly *one* immediate parent using the `extends` keyword.
+Inheritance (`extends`) allows a child class to inherit fields and methods from a parent class. While this promotes code reusability, a Senior Java Developer must understand how the JVM physically structures inherited objects in the Heap and how the compiler routes method calls.
 
-## The "Is-A" Relationship
+## Memory Layout of Inherited Objects
 
-Inheritance establishes an "**Is-A**" hierarchy. A `Dog` Is-A `Animal`. A `SavingsAccount` Is-A `BankAccount`. The child class inherits all non-private fields and methods from the parent, allowing infinite code reuse.
+When you instantiate a `Child` object, the JVM does *not* create two separate objects (a Parent and a Child). 
 
-### The Diamond Death Problem
+**The JVM creates a single, contiguous block of memory.** 
+The memory block contains:
+1. The 12-byte Object Header (Mark Word + Klass Pointer).
+2. All instance variables declared in the `Parent` (even private ones!).
+3. All instance variables declared in the `Child`.
 
-If Java allowed multiple inheritance:
 ```mermaid
-classDiagram
-    direction TD
-    Animal <|-- Dog
-    Animal <|-- Cat
-    Dog <|-- CatDog
-    Cat <|-- CatDog
-    
-    class Animal {
-        +speak() "Makes sound"
-    }
-    class Dog {
-        +speak() "Barks"
-    }
-    class Cat {
-        +speak() "Meows"
-    }
-    class CatDog {
-        // Does CatDog Inherit Barks or Meows?
-    }
-```
-*Because Java only allows single inheritance, this ambiguity is physically impossible to create via classes.* (Java uses Interfaces to handle multiple behaviors).
-
-## Python vs Java Syntax
-
-**Python:**
-```python
-class Animal:
-    def speak(self): print("Sound")
-
-class Dog(Animal): # In parenthesis
-    def speak(self): # Overriding
-        super().speak()
-        print("Bark")
+block-beta
+  columns 1
+  Header("Object Header (12 Bytes)\nKlass -> Child.class")
+  ParentFields("Parent Fields (e.g., int id = 8 bytes)")
+  ChildFields("Child Fields (e.g., boolean active = 1 byte)")
+  Padding("Padding (3 bytes to align to 24-byte boundary)")
 ```
 
-**Java:**
-```java
-class Animal {
-    void speak() { System.out.println("Sound"); }
-}
+*Architect Concept:* Even if a field in the Parent is marked `private`, it is still physically allocated inside the Child's memory block. The Child object physically possesses the memory; it is merely restricted by the compiler from directly addressing it syntactically.
 
-class Dog extends Animal { // Uses "extends" keywords
-    @Override // Highly recommended annotation
-    void speak() { 
-        super.speak();
-        System.out.println("Bark"); 
-    }
-}
-```
+## The Virtual Method Table (V-Table)
 
-## The `super` Keyword
+If a Child overrides a Parent's method, how does the JVM instantly know which one to execute at runtime? 
+Java does not search the class hierarchy tree linearly every time you call a method (which would destroy performance). It uses an array of pointers called the **V-Table**.
 
-When dealing with inheritance, `super` refers to the immediate parent class, similar to `this` referring to the current class.
+1. Every `Class` defined in Metaspace has an internal array of memory pointers to its method implementations (the V-Table).
+2. When a class is loaded, its V-Table is cloned from its Parent's V-Table.
+3. If the Child adds a new method, it is appended to the bottom of the V-Table array.
+4. If the Child *overrides* an existing method, the pointer at the exact same array index is silently swapped out to point to the new Child implementation.
 
-1. **`super.method()`:** Calls the method belonging to the parent.
-2. **`super()`:** Calls the constructor belonging to the parent.
-   - **CRUCIAL RULE:** If the parent class has a parameterized constructor, the child class *must* call `super(args)` as the absolute first line of its own constructor. Java will not guess data.
+When executing `child.print()`, the JVM looks at the object's Klass pointer, jumps instantly to an exact, mathematically fixed index in the V-Table array, and executes the highly optimized machine code. This is why Java method dispatch operates in `O(1)` constant time.
 
-## Object Class: The Silent King
+## Python Comparison: Multiple Inheritance and MRO
 
-In Java, *every single class* inherits from `java.lang.Object`. If you type `class Dog {}`, the compiler actually interprets it as `class Dog extends Object {}`. This is where methods like `equals()`, `hashCode()`, and `toString()` come from.
+In Python, classes can inherit from dozens of disparate parents (`class Child(Base1, Base2):`). Because Python objects are hash dictionaries, resolving a method call forces the Python interpreter to traverse the inheritance tree node-by-node dynamically (Method Resolution Order - MRO) every single time a method is invoked. This is excruciatingly slow.
+
+Java structurally outlaws multiple inheritance. By strictly enforcing a linear `Object -> Parent -> Child` chain, the JVM can map methods mathematically into a highly optimized, flat, contiguous memory V-Table. 
 
 ---
 
-## Interview Questions
+## Interview Questions - Architect Level
 
-### Conceptual
-**Q: Why doesn't Java support multiple inheritance for classes?**
-A: To prevent ambiguity known as the "Diamond Problem", where a class inherits from two parents who both have the same method signature, leaving the compiler guessing which implementation to prioritize.
+**Q1: How does Java simulate a structurally independent Parent object during `super()` execution if only a single memory block exists?**
+> The `super()` constructor invocation does not create a functional "Parent Object". There is no separate object header. It simply commands the JVM execution engine to initialize the memory coordinates explicitly mapped for the Parent's declared variables living inside the contiguous Child object block footprint. The entire system is operating exclusively on a single object allocation.
 
-**Q: Explain the difference between `super` and `this`.**
-A: `this` refers to the current instance of the class (handling naming shadow issues and constructor chains). `super` specifically targets the immediate parent class (for calling overridden methods or parent constructors).
+**Q2: Since `private` inherited fields physically reside in the Child's Heap memory block, how does the JVM prevent the Child from mutating them?**
+> Access Modifiers natively exist as semantic constraints only during the `javac` compile-time phase. The compiler rigorously scans variable assignments; if it detects an illegal access against a `private` field, it explicitly refuses to generate the final Bytecode execution. At runtime, the JVM structurally ignores it; a developer can trivially execute `Field.setAccessible(true)` via Reflection and dynamically overwrite the private parent memory residing locally in the Child object.
 
-### Scenario / Debug
-**Q: The parent class `Vehicle` has no default constructor, only `Vehicle(String make)`. The child class `Car extends Vehicle` has an empty block `{}`. Why does it fail to compile?**
-A: The compiler inserts an invisible default constructor `Car() { super(); }` into the child. The invisible `super()` takes zero arguments and tries to call `Vehicle()`. But `Vehicle()` doesn't exist anymore! The developer must manually write a `Car` constructor to call `super(make)`.
-
-### Quick Fire
-- **What keyword is used to inherit from another class?** `extends`
-- **What class is at the top of every hierarchy in Java?** `Object`
+**Q3: Explain the mechanical process of method routing utilizing a V-Table array.**
+> Virtual method dispatch executes utilizing memory offsets. When a method is compiled, the compiler dictates that method `B` will strictly reside at index offset `1`. When the instruction engine reads an `invokevirtual` bytecode instruction against the `Child`, it traverses the Klass pointer up into the native JVM Metaspace. It maps the array lookup at index `1`, instantly capturing the stored physical C++ machine code pointer execution address, regardless of whether that pointer leads to the base Parent implementation or a swapped Child overriding implementation.
