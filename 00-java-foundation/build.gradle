@@ -1,0 +1,46 @@
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  MODULE  : 00-java-foundation                                      ║
+// ║  PURPOSE : Standalone Gradle build for pure Java demos (no Spring) ║
+// ║  RUN     : ./gradlew :00-java-foundation:run --args="ClassName"   ║
+// ║  TEST    : ./gradlew :00-java-foundation:test                     ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.learning'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JUnit 5 for unit testing
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// ── Application Plugin Config ──────────────────────────────────────
+// Allows running any demo class via:
+//   ./gradlew :00-java-foundation:run --args="HowJavaWorks"
+//
+// The mainClass is resolved dynamically from the first CLI argument.
+// If no argument is given, it defaults to HowJavaWorks.
+application {
+    mainClass = providers.gradleProperty('mainClass')
+        .orElse('com.learning.basics.HowJavaWorks')
+}
+
+// Override mainClass from --args if using a runner script
+tasks.named('run') {
+    // Enable stdin for Scanner-based exercises
+    standardInput = System.in
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
