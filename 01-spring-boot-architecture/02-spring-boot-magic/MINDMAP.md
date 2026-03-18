@@ -1,31 +1,33 @@
+# Mindmap: Spring Boot Magic
+
 ```mermaid
 mindmap
   root((Spring Boot Magic))
-    Spring Boot Goals
-      Convention Over Configuration
+    The Problem
+      XML Hell
+      Dependency version conflicts
+      Boilerplate server setup
+    The Philosophy
+      Convention over Configuration
+      Opinionated defaults
       Zero XML
-      Opinionated Defaults
-      Embedded Servers (Tomcat)
-    Auto-Configuration Engine
-      @EnableAutoConfiguration
-      @Conditional Annotations
-        @ConditionalOnClass
-        @ConditionalOnMissingBean
-        @ConditionalOnProperty
-      spring.factories registry
-    Starters
+    Mechanism 1: Starters
       Pre-packaged dependency trees
       spring-boot-starter-web
       spring-boot-starter-data-jpa
-      spring-boot-starter-test
-      Version Alignment Guarantee
+      No Version Clashes (BOM)
+    Mechanism 2: Auto-Configuration
+      Thousands of @Configuration classes
+      classpath scanning
+      @EnableAutoConfiguration
+    The @Conditional Engine
+      @ConditionalOnClass
+      @ConditionalOnMissingBean
+      @ConditionalOnProperty
     Application Properties
-      Global Overrides
-      server.port=8080
-      spring.datasource.url
-      Injecting custom values
-        @Value("${app.tax}")
-      Environment Profiles
-        application-dev.properties
-        application-prod.properties
+      application.properties / yml
+      Overriding Boot defaults (e.g. server.port)
+      Custom Business Keys
+      @Value Injection
+      Profile-specific (dev, prod)
 ```

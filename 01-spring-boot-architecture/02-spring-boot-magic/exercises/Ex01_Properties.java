@@ -4,7 +4,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * EXERCISE 1: Simulating @Value from application.properties
+ * ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+ * ║ FILE: Ex01_Properties.java                                                               ║
+ * ║ PURPOSE & CONCEPT: Simulating @Value from application.properties                         ║
+ * ║ Shows how configuration values are resolved into beans during application startup.       ║
+ * ║                                                                                          ║
+ * ║ ┌──────────────────────────────────────────────────────────────────────────────────────┐ ║
+ * ║ │ ASCII DIAGRAM: @Value Resolution                                                     │ ║
+ * ║ ├──────────────────────────────────────────────────────────────────────────────────────┤ ║
+ * ║ │ [application.properties] ──(Loaded Into)──► [Spring Env]                             │ ║
+ * ║ │                                       │                                              │ ║
+ * ║ │                                       └─(@Value)─►[Bean]                             │ ║
+ * ║ └──────────────────────────────────────────────────────────────────────────────────────┘ ║
+ * ║                                                                                          ║
+ * ║ PYTHON COMPARE:                                                                          ║
+ * ║ Like using `os.getenv('VAR', default_Value)` or reading a config.ini dynamically.        ║
+ * ╚══════════════════════════════════════════════════════════════════════════════════════════╝
  * 
  * TASK:
  * 1. Read the provided 'MockSpringEnvironment' map simulating an application.properties file.
@@ -17,22 +32,23 @@ public class Ex01_Properties {
 
     public static void main(String[] args) {
         
+        // Memory Map Simulation
+        
         // This Map simulates loaded application.properties in Spring Memory
-        Map<String, String> applicationProperties = new HashMap<>();
+        var applicationProperties = new HashMap<String, String>();
         applicationProperties.put("stripe.api.key", "sk_test_12345");
         // Application forgot to set stripe.timeout.ms!
 
         System.out.println("--- Booting Stripe Service ---");
         
-        // TODO: 3. Extract the values from applicationProperties map.
-        // TODO: 5. Ensure the timeout correctly falls back to "5000" if null.
-        String apiKey = applicationProperties.get("stripe.api.key");
+        // Extract the values from applicationProperties map using modern var syntax.
+        var apiKey = applicationProperties.get("stripe.api.key");
         
-        String timeoutStr = applicationProperties.get("stripe.timeout.ms");
-        int timeoutMillis = (timeoutStr != null) ? Integer.parseInt(timeoutStr) : 5000;
+        var timeoutStr = applicationProperties.get("stripe.timeout.ms");
+        var timeoutMillis = (timeoutStr != null) ? Integer.parseInt(timeoutStr) : 5000;
 
         // Creating the Service (In real Spring, the IoC does this passing the @Value fields automatically)
-        StripeService service = new StripeService(apiKey, timeoutMillis);
+        var service = new StripeService(apiKey, timeoutMillis);
         
         service.charge();
     }

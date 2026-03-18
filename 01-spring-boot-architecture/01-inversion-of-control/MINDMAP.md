@@ -1,43 +1,50 @@
+# Mindmap: Inversion of Control & Dependency Injection
+
 ```mermaid
 mindmap
-  root((Inversion of Control))
-    The Problem
+  root((Spring IoC
+  Foundation))
+    Problem
       Tight Coupling
       Hardcoded 'new' keyword
-      Testing is Impossible
+      Impossible to Unit Test
+      Violates Open-Closed Principle
+    Core Solution
+      Inversion of Control (IoC)
+      Externalize Object Creation
+      Rely on Abstractions
     The Container
-      Application Context
-      IoC Registry Map
-      Bean
-        Spring managed object
+      ApplicationContext
+      BeanDefinition Registry
+      Startup Sequence
     Dependency Injection
-      Constructor Injection
-        Enterprise Standard
-        Immutable (final field)
-        Guaranteed Initialization
-      Setter Injection
-        Optional Dependencies
-      Field Injection
-        Anti-Pattern
-        Private Field Mutability
-        Testing Nightmare
+      Field Injection (Anti-Pattern)
+      Setter Injection (Optional Deps)
+      Constructor Injection (Best Practice)
+        Forces Requirements
+        Guarantees Immutability (final)
+        Trivial to Test
     Component Scanning
       @SpringBootApplication
-      Stereotypes
-        @Component
-        @Service
-        @Repository
-        @Controller
-      @Configuration + @Bean
-        Third Party Libraries
+      @Component
+      @Service (Business Logic)
+      @Repository (DB Access)
+      @Controller (Web Endpoints)
+      @Configuration & @Bean (3rd Party)
     Bean Scopes
-      Singleton
-        Default
-        One Instance Globally
-        Must be STATELESS
+      Singleton (Default)
+        Must be Stateless
+        One instance per Heap
       Prototype
-        New Instance per Request
+        New instance every time
+        Not tracked by Spring
       Web Scopes
         @RequestScope
         @SessionScope
+    Lifecycle
+      Instantiation
+      Dependency Injection
+      @PostConstruct
+      Ready / Use
+      @PreDestroy
 ```

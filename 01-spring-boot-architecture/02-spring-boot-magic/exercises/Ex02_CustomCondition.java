@@ -4,7 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * EXERCISE 2: Simulating @Conditional Auto-Configuration
+ * ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+ * ║ FILE: Ex02_CustomCondition.java                                                          ║
+ * ║ PURPOSE & CONCEPT: Simulating @Conditional Auto-Configuration                            ║
+ * ║ Demonstrates building manual condition rules matching property requirements to see       ║
+ * ║ exactly how `@Conditional` annotations evaluate before loading a Bean.                   ║
+ * ║                                                                                          ║
+ * ║ ┌──────────────────────────────────────────────────────────────────────────────────────┐ ║
+ * ║ │ ASCII DIAGRAM: @Conditional Evaluation                                               │ ║
+ * ║ ├──────────────────────────────────────────────────────────────────────────────────────┤ ║
+ * ║ │ [Environment: database.type=mysql]                                                   │ ║
+ * ║ │        │                                                                             │ ║
+ * ║ │ [Condition Evaluator]                                                                │ ║
+ * ║ │        ├──► Match? YES ──► Return MySQLDatabase                                      │ ║
+ * ║ │        └──► Match? NO  ──► Return InMemH2Database                                    │ ║
+ * ║ └──────────────────────────────────────────────────────────────────────────────────────┘ ║
+ * ║                                                                                          ║
+ * ║ PYTHON COMPARE:                                                                          ║
+ * ║ `if os.getenv('database.type') == 'mysql': db = MySQL() else: db = H2()`                 ║
+ * ╚══════════════════════════════════════════════════════════════════════════════════════════╝
  * 
  * TASK:
  * 1. Simulating Spring Boot, read the conceptual "application.properties" map.
@@ -17,21 +35,22 @@ public class Ex02_CustomCondition {
 
     public static void main(String[] args) {
         
-        Map<String, String> applicationProperties = new HashMap<>();
+        // Simulated environment variables
+        
+        var applicationProperties = new HashMap<String, String>();
         // User explicitly defines the property:
         applicationProperties.put("database.type", "mysql");
 
         System.out.println("--- Booting Application (Simulating Spring Run) ---");
         
-        Database activeDatabase = autoConfigureDatabase(applicationProperties);
+        var activeDatabase = autoConfigureDatabase(applicationProperties);
         activeDatabase.connect();
     }
 
-    // This method perfectly physically mimics the massive internal engine of Spring Boot Auto-Configuration
     public static Database autoConfigureDatabase(Map<String, String> env) {
         
-        // TODO: 3. Read the property
-        String dbType = env.get("database.type");
+        // Read the property using var
+        var dbType = env.get("database.type");
 
         // TODO: 4 & 5. Write the condition rules
         if ("mysql".equalsIgnoreCase(dbType)) {

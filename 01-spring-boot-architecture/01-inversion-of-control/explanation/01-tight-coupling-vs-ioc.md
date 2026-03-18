@@ -1,10 +1,14 @@
-# Tight Coupling vs. Inversion of Control (IoC)
+# 01 - Tight Coupling vs. Inversion of Control (IoC)
 
-Before understanding Spring Boot, you must fundamentally understand the architectural problem it was created to solve: **Tight Coupling**.
+> **Python Bridge:** In Python, you might `import` a concrete class and instantiate it directly. In Spring, you define dependencies (usually interfaces) and let the framework "inject" the concrete implementation at runtime, somewhat similar to Python's `dependency_injector` library or FastAPI's `Depends()`.
 
-## The Problem: Tight Coupling
+Before diving into Spring Boot specifics, we must understand the core architectural problem it solves: **Tight Coupling**.
 
-In traditional Java applications, an object physically instantiates its own dependencies using the `new` keyword.
+---
+
+## 1. The Problem: Tight Coupling
+
+In traditional Java applications, an object manually creates its own dependencies using the `new` keyword.
 
 ```java
 public class PaymentService {
@@ -17,18 +21,35 @@ public class PaymentService {
 }
 ```
 
-**Why is this disastrous for Enterprise systems?**
-1. **Testing is impossible:** You cannot unit test `PaymentService` without physically hitting the real Stripe API. You cannot swap in a `MockGateway`.
-2. **Replacement is painful:** If the company migrates from Stripe to PayPal, you have to physically open the `PaymentService` source code and rewrite it. This violates the Open-Closed Principle (SOLID).
+### Why is this disastrous for Enterprise systems?
 
-## The Solution: Inversion of Control (IoC)
+1. **Testing is Impossible:** You cannot unit test `PaymentService` without hitting the real Stripe API. Swapping in a `MockGateway` is mathematically impossible because the `new` keyword is hardcoded.
+2. **Replacement is Painful:** If the business migrates from Stripe to PayPal, you must open the `PaymentService` source code, delete `StripeGateway`, and replace it. This violates the **Open-Closed Principle (SOLID)**.
 
-Inversion of Control states: **Objects should not create their dependencies. Dependencies should be handed to them from the outside.**
+```mermaid
+classDiagram
+    class PaymentService {
+        -StripeGateway gateway
+        +charge(amount)
+    }
+    class StripeGateway {
+        +process(amount)
+    }
+    
+    PaymentService *-- StripeGateway : Strong Composition (Tight Coupling)
+    note for PaymentService "Hardcoded 'new StripeGateway()'\nCannot be mocked for tests!"
+```
+
+---
+
+## 2. The Solution: Inversion of Control (IoC)
+
+Inversion of Control (IoC) states: **Objects should not create their dependencies. Dependencies should be handed to them from the outside.**
 
 ```java
 public class PaymentService {
-    // LOOSE COUPLING: We depend on an Abstraction (Interface), not a Concrete Class.
-    private PaymentGateway gateway;
+    // LOOSE COUPLING: Depending on an Abstraction (Interface)
+    private final PaymentGateway gateway;
 
     // The dependency is injected from the outside!
     public PaymentService(PaymentGateway gateway) {
@@ -41,13 +62,41 @@ public class PaymentService {
 }
 ```
 
-**The Architectural Shift:**
-The control over dependency creation has been "inverted." The `PaymentService` no longer controls *how* or *when* the gateway is created. It just blindly accepts whatever gateway is passed into its constructor.
+### The Architectural Shift
 
-## Who creates the object then?
+The control over *how* and *when* the dependency is created has been "inverted". The `PaymentService` no longer cares what specific gateway it is using, provided it implements the `PaymentGateway` interface.
 
-If the object doesn't create its dependencies, someone else must. 
-In a small app, the `main()` method does it:
+```mermaid
+classDiagram
+    class PaymentService {
+        -PaymentGateway gateway
+        +charge(amount)
+    }
+    class PaymentGateway {
+        <<interface>>
+        +process(amount)
+    }
+    class StripeGateway {
+        +process(amount)
+    }
+    class MockGateway {
+        +process(amount)
+    }
+    
+    PaymentService o-- PaymentGateway : Aggregation (Loose Coupling)
+    PaymentGateway <|.. StripeGateway
+    PaymentGateway <|.. MockGateway
+    
+    note for PaymentService "Constructor accepts interface.\nEasily mockable!"
+```
+
+---
+
+## 3. The Role of the IoC Container
+
+If an object doesn't create its dependencies, who does? 
+
+In a small application, the `main()` method handles it (Manual Dependency Injection):
 
 ```java
 public static void main(String[] args) {
@@ -58,6 +107,25 @@ public static void main(String[] args) {
 }
 ```
 
-In an Enterprise Application with 10,000 objects, manually writing the `new` logic in the `main` method becomes a nightmare. 
+However, in an Enterprise application with 10,000 components, writing manual object graphs becomes an unmaintainable nightmare.
 
-This is exactly why the **Spring Application Context (The IoC Container)** exists. It acts as an invisible factory that instantiates all your objects, figures out who needs who, and automatically injects them into each other at startup.
+This is exactly why the **Spring Application Context (The IoC Container)** exists. It acts as an invisible factory that:
+1. Discovers all your objects (`@Component`, `@Service`).
+2. Figures out their dependency graph.
+3. Instantiates them in the correct order.
+4. Auto-injects them into each other (`@Autowired`) at startup.
+
+---
+
+## Interview Questions
+
+### Conceptual
+**Q: What is Inversion of Control (IoC) in the context of Spring?**
+> **A:** IoC is a design principle where the flow of control regarding object creation and management is inverted. Instead of objects creating their own dependencies using the `new` keyword, an external container (the Spring IoC container) handles the instantiation, configuration, and injection of these dependencies at runtime.
+
+**Q: Why is Tight Coupling considered bad practice in enterprise software?**
+> **A:** Tight coupling makes code rigid, hard to maintain, and nearly impossible to test in isolation. When class A instantiates class B internally, you cannot unit test class A without also executing class B's logic. It also violates the Open-Closed Principle, as replacing class B with class C requires modifying class A's source code.
+
+### Scenario/Debug
+**Q: A junior developer asks why they shouldn't just write `PaymentService svc = new PaymentService(new PaypalGateway())` in their controller. How do you explain the architectural flaw?**
+> **A:** Manually instantiating the service in the controller means the controller is now responsible for managing the lifecycle and dependencies of the service. If `PaymentService` suddenly requires a `DatabaseRepository` tomorrow, you must modify the controller to create the repository as well. By delegating this to Spring's IoC container, the controller only asks for a `PaymentService`, and Spring automatically resolves the entire dependency graph, making the architecture highly modular and resilient to change.

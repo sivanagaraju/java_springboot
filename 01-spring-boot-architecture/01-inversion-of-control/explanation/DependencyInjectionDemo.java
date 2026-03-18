@@ -1,26 +1,52 @@
 package explanation;
 
 /**
- * While Spring Boot automates this, this class demonstrates
- * the actual manual mechanical difference between Field and Constructor Injection.
+ * ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+ * ║ FILE: DependencyInjectionDemo.java                                                       ║
+ * ║ PURPOSE & CONCEPT: Types of Dependency Injection                                         ║
+ * ║ Demonstrates why Constructor Injection is vastly superior to Field Injection natively.   ║
+ * ║ Shows how field injection can lead to NullPointerExceptions if not managed carefully.    ║
+ * ║                                                                                          ║
+ * ║ ┌──────────────────────────────────────────────────────────────────────────────────────┐ ║
+ * ║ │ ASCII DIAGRAM: Constructor vs Field Injection                                        │ ║
+ * ║ ├──────────────────────────────────────────────────────────────────────────────────────┤ ║
+ * ║ │   FIELD INJECTION (Bad)           CONSTRUCTOR INJECTION (Good)                       │ ║
+ * ║ │   ┌────────────────┐              ┌────────────────┐                                 │ ║
+ * ║ │   │  Service       │              │  Service       │                                 │ ║
+ * ║ │   │  @Autowired    │              │  db (final)    │                                 │ ║
+ * ║ │   │  Database db;  │              └───────▲────────┘                                 │ ║
+ * ║ │   └──────▲─────────┘                      │                                          │ ║
+ * ║ │          │ (Magic)                        │ (JVM enforces at compilation)            │ ║
+ * ║ │   ┌──────┴─────────┐              ┌───────┴────────┐                                 │ ║
+ * ║ │   │ Spring Context │              │ JVM / Compiler │                                 │ ║
+ * ║ │   └────────────────┘              └────────────────┘                                 │ ║
+ * ║ └──────────────────────────────────────────────────────────────────────────────────────┘ ║
+ * ║                                                                                          ║
+ * ║ PYTHON COMPARE:                                                                          ║
+ * ║ Field Injection is like randomly setting an attribute from outside without `__init__`.   ║
+ * ║                                                                                          ║
+ * ║ HOW TO RUN: ./gradlew :01-spring-boot-architecture:run --args="DependencyInjectionDemo"  ║
+ * ╚══════════════════════════════════════════════════════════════════════════════════════════╝
  */
 public class DependencyInjectionDemo {
 
     public static void main(String[] args) {
+        // --- Field Injection Failure ---
         System.out.println("--- Field Injection Failure ---");
-        FieldInjectionService fieldService = new FieldInjectionService();
+        var fieldService = new FieldInjectionService();
         try {
             fieldService.doWork();
         } catch (NullPointerException e) {
             System.out.println("CRASH! The database was never injected because the field is private!");
         }
 
+        // --- Constructor Injection Success ---
         System.out.println("\n--- Constructor Injection Success ---");
-        DatabaseConnection realDb = new DatabaseConnection();
+        var realDb = new DatabaseConnection();
         
         // The Java Compiler physically FORCES us to provide the DatabaseConnection.
         // It is mathematically impossible to instantiate ConstructorInjectionService in a broken state.
-        ConstructorInjectionService constructorService = new ConstructorInjectionService(realDb);
+        var constructorService = new ConstructorInjectionService(realDb);
         constructorService.doWork();
     }
 

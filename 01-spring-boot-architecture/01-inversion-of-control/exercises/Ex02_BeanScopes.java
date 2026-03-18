@@ -1,7 +1,26 @@
 package exercises;
 
 /**
- * EXERCISE 2: The Danger of Singleton Scope
+ * ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+ * ║ FILE: Ex02_BeanScopes.java                                                               ║
+ * ║ PURPOSE & CONCEPT: The Danger of Singleton Scope                                         ║
+ * ║ Observes a 'MetricsService' class designed as a Singleton containing dangerous           ║
+ * ║ class-level state. Shows how multiple threads interacting with the EXACT same            ║
+ * ║ physical instance can lead to catastrophic data corruption.                              ║
+ * ║                                                                                          ║
+ * ║ ┌──────────────────────────────────────────────────────────────────────────────────────┐ ║
+ * ║ │ ASCII DIAGRAM: Singleton Corruption                                                  │ ║
+ * ║ ├──────────────────────────────────────────────────────────────────────────────────────┤ ║
+ * ║ │ [User A Thread] ──(modifies)──► ┌─────────────────────┐                              │ ║
+ * ║ │                                 │ Singleton MetricsSvc│                              │ ║
+ * ║ │ [User B Thread] ──(modifies)──► │    lastEvent = ?    │                              │ ║
+ * ║ │                                 └─────────────────────┘                              │ ║
+ * ║ │ * Both users share the EXACT same memory address!                                    │ ║
+ * ║ └──────────────────────────────────────────────────────────────────────────────────────┘ ║
+ * ║                                                                                          ║
+ * ║ PYTHON COMPARE:                                                                          ║
+ * ║ Using a global variable or module-level variable that gets concurrently modified.        ║
+ * ╚══════════════════════════════════════════════════════════════════════════════════════════╝
  * 
  * TASK:
  * 1. Observe the 'MetricsService' class. It is designed as a Singleton.
@@ -24,11 +43,11 @@ public class Ex02_BeanScopes {
         System.out.println("--- Singleton State Corruption Demo ---");
 
         // User A requests the bean and logs an event
-        MetricsService userABean = getBean();
+        var userABean = getBean();
         userABean.setLastEvent("User A logged in.");
 
         // User B requests the exact identical bean and logs their event
-        MetricsService userBBean = getBean();
+        var userBBean = getBean();
         userBBean.setLastEvent("User B purchased item.");
 
         // What does User A see if they check the "Last Event" now?

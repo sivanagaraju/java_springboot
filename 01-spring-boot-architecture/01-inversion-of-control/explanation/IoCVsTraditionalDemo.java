@@ -1,20 +1,47 @@
 package explanation;
 
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════════════════╗
+ * ║ FILE: IoCVsTraditionalDemo.java                                                          ║
+ * ║ PURPOSE & CONCEPT: Inversion of Control vs Tight Coupling                                ║
+ * ║ Demonstrates the core mechanical difference between hardcoding dependencies (`new`)      ║
+ * ║ and injecting them via the constructor (IoC). Shows why IoC leads to testable code.      ║
+ * ║                                                                                          ║
+ * ║ ┌──────────────────────────────────────────────────────────────────────────────────────┐ ║
+ * ║ │ ASCII DIAGRAM: Inversion of Control vs Tight Coupling                                │ ║
+ * ║ ├──────────────────────────────────────────────────────────────────────────────────────┤ ║
+ * ║ │   TIGHT COUPLING (Bad)                 INVERSION OF CONTROL (Good)                   │ ║
+ * ║ │   ┌─────────────────┐                  ┌─────────────┐                               │ ║
+ * ║ │   │ BadOrderService │                  │ Spring      │ ────(injects)───┐           │ ║
+ * ║ │   │                 │                  │ Container   │                 ▼           │ ║
+ * ║ │   │  new Gateway()  │──(hardcoded)──►  └─────────────┘         ┌─────────┴────────┐  │ ║
+ * ║ │   └─────────────────┘                                          │ GoodOrderService │  │ ║
+ * ║ │                                                                └──────────────────┘  │ ║
+ * ║ └──────────────────────────────────────────────────────────────────────────────────────┘ ║
+ * ║                                                                                          ║
+ * ║ PYTHON COMPARE:                                                                          ║
+ * ║ Tight: `self.gateway = HardcodedGateway()` vs IoC: `def __init__(self, gateway)`         ║
+ * ║                                                                                          ║
+ * ║ HOW TO RUN: ./gradlew :01-spring-boot-architecture:run --args="IoCVsTraditionalDemo"     ║
+ * ╚══════════════════════════════════════════════════════════════════════════════════════════╝
+ */
 public class IoCVsTraditionalDemo {
 
     public static void main(String[] args) {
+        // --- Traditional Tight Coupling ---
         System.out.println("--- Traditional Tight Coupling ---");
-        BadOrderService badService = new BadOrderService();
+        var badService = new BadOrderService();
         badService.processOrder();
         // PROBLEM: We cannot test BadOrderService without hitting the real HardcodedPaymentGateway.
 
+        // --- Inversion of Control (IoC) ---
         System.out.println("\n--- Inversion of Control (IoC) ---");
-        // We create the dependency externally
-        PaymentGateway mockGateway = new MockPaymentGateway(); 
+        // We create the dependency externally using modern 'var'
+        var mockGateway = new MockPaymentGateway(); 
         
         // We INJECT the dependency through the constructor.
         // We inverted the control of dependency creation!
-        GoodOrderService goodService = new GoodOrderService(mockGateway);
+        var goodService = new GoodOrderService(mockGateway);
         goodService.processOrder();
         // BENEFIT: GoodOrderService is completely decoupled and easily unit testable.
     }
