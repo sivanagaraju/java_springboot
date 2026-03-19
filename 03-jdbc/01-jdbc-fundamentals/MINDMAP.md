@@ -1,0 +1,59 @@
+# JDBC Fundamentals Mindmap
+
+- JDBC Fundamentals
+  - Architecture
+    - java.sql package (API layer)
+    - javax.sql package (extensions)
+    - JDBC Driver types (1-4)
+      - Type 4: Pure Java (modern standard)
+    - Driver loading (automatic via ServiceLoader)
+    - Connection URL format: jdbc:postgresql://host:port/db
+  - Connection Management
+    - DriverManager.getConnection(url, user, pass)
+    - Connection interface methods
+    - AutoCloseable (try-with-resources)
+    - Connection properties (timeout, schema)
+    - Python: psycopg2.connect(dsn)
+  - Statement Types
+    - Statement (static SQL)
+      - SQL injection vulnerable!
+      - Only for DDL or trusted SQL
+    - PreparedStatement (parameterized)
+      - Compiled once, executed many times
+      - Type-safe parameter binding
+      - SQL injection safe
+    - CallableStatement (stored procedures)
+      - IN / OUT / INOUT parameters
+  - PreparedStatement Deep Dive
+    - setString(1, value) — 1-indexed!
+    - Batch operations
+      - addBatch() + executeBatch()
+      - 100x faster for bulk inserts
+    - Python: cursor.execute(sql, (param1, param2))
+  - ResultSet
+    - next() — cursor-based iteration
+    - getString("column_name") vs getString(1)
+    - Type mapping: VARCHAR→String, INTEGER→int
+    - wasNull() for nullable columns
+    - Python: cursor.fetchone() / fetchall()
+  - Transactions
+    - ACID: Atomicity, Consistency, Isolation, Durability
+    - conn.setAutoCommit(false)
+    - conn.commit() / conn.rollback()
+    - Savepoints: conn.setSavepoint("name")
+    - Isolation levels
+      - READ_UNCOMMITTED (dirty reads)
+      - READ_COMMITTED (default PostgreSQL)
+      - REPEATABLE_READ
+      - SERIALIZABLE (strictest)
+  - Connection Pooling
+    - Problem: new connection = TCP + auth (~50ms)
+    - Solution: reuse connections from pool
+    - Pool lifecycle: create → borrow → use → return → destroy
+    - Sizing: connections ≈ CPU cores × 2
+  - HikariCP
+    - Default in Spring Boot
+    - maximumPoolSize (default 10)
+    - connectionTimeout (default 30s)
+    - idleTimeout (default 10min)
+    - Leak detection (leakDetectionThreshold)

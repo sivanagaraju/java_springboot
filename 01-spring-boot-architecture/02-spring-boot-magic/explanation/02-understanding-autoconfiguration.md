@@ -55,6 +55,38 @@ It is fundamentally a composite "macro" annotation that perfectly combines exact
 
 ---
 
+## 4. Python vs. Java Code Comparison
+
+| Concept | Python (Manual Logic) | Java (Auto-Config) |
+|---|---|---|
+| **Detection** | `import pkgutil; pkgutil.find_loader('pg')` | `@ConditionalOnClass(DataSource.class)` |
+| **Fallback** | `if not db: db = MockDB()` | `@ConditionalOnMissingBean(DataSource.class)` |
+| **Toggle** | `if os.getenv('USE_REDIS'): ...` | `@ConditionalOnProperty("redis.enabled")` |
+
+```python
+# Python: Manual conditional logic
+try:
+    import redis
+    cache = redis.Redis()
+except ImportError:
+    cache = InMemoryCache()
+```
+
+```java
+// Java: Declarative auto-configuration
+@Configuration
+@ConditionalOnClass(RedisClient.class)
+public class RedisAutoConfig {
+    @Bean
+    @ConditionalOnMissingBean
+    public Cache redisCache() {
+        return new RedisCache();
+    }
+}
+```
+
+---
+
 ## Interview Questions
 
 ### Conceptual

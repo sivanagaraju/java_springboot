@@ -1,0 +1,64 @@
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  MODULE  : 03-jdbc                                                 ║
+// ║  PURPOSE : JDBC fundamentals — raw database access with Java       ║
+// ║  RUN     : ./gradlew :03-jdbc:run -PmainClass=com.springmastery.  ║
+// ║            jdbc.demo.JdbcConnectionDemo                            ║
+// ║  TEST    : ./gradlew :03-jdbc:test                                 ║
+// ╠═══════════════════════════════════════════════════════════════════╣
+// ║  DEPENDENCIES                                                      ║
+// ║                                                                    ║
+// ║  Your Code                                                         ║
+// ║      │                                                             ║
+// ║      ├──► java.sql (JDBC API)           ← JDK built-in            ║
+// ║      ├──► PostgreSQL Driver             ← JDBC Type 4 driver      ║
+// ║      └──► HikariCP                     ← Connection pool          ║
+// ║              │                                                     ║
+// ║              └──► slf4j-simple          ← Logging (HikariCP needs)║
+// ║                                                                    ║
+// ║  Python equivalent:                                                ║
+// ║    pip install psycopg2 sqlalchemy                                 ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+
+plugins {
+    id 'java'
+    id 'application'
+}
+
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // ── Database Driver ────────────────────────────────────────────
+    // PostgreSQL JDBC Type 4 driver — pure Java, no native code.
+    // Python equivalent: psycopg2 (pip install psycopg2-binary)
+    implementation 'org.postgresql:postgresql:42.7.2'
+
+    // ── Connection Pool ────────────────────────────────────────────
+    // HikariCP — the fastest JDBC connection pool.
+    // Spring Boot uses HikariCP by default.
+    // Python equivalent: SQLAlchemy create_engine(pool_size=10)
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+
+    // ── Logging (HikariCP requires SLF4J) ──────────────────────────
+    // HikariCP uses SLF4J for logging. Without an SLF4J binding,
+    // you get "SLF4J: No SLF4J providers found" warnings.
+    implementation 'org.slf4j:slf4j-simple:2.0.12'
+}
+
+// ── Application Plugin Config ──────────────────────────────────────
+// Run any demo class:
+//   ./gradlew :03-jdbc:run -PmainClass=com.springmastery.jdbc.demo.JdbcConnectionDemo
+//   ./gradlew :03-jdbc:run -PmainClass=com.springmastery.jdbc.demo.PreparedStatementDemo
+//   ./gradlew :03-jdbc:run -PmainClass=com.springmastery.jdbc.demo.TransactionDemo
+//   ./gradlew :03-jdbc:run -PmainClass=com.springmastery.jdbc.demo.HikariCPDemo
+application {
+    mainClass = providers.gradleProperty('mainClass')
+        .orElse('com.springmastery.jdbc.demo.JdbcConnectionDemo')
+}
+
+tasks.named('run') {
+    standardInput = System.in
+}

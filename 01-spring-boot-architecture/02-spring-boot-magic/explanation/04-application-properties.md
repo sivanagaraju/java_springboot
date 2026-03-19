@@ -75,6 +75,31 @@ By passing an environment variable or flag to the JVM argument (`-Dspring.profil
 
 ---
 
+## 4. Python vs. Java Code Comparison
+
+| Task | Python (os.environ / pydantic) | Java (@Value / @ConfigurationProperties) |
+|---|---|---|
+| **Single Value** | `os.getenv("DB_URL")` | `@Value("${spring.datasource.url}")` |
+| **Defaults** | `os.getenv("PORT", "8000")` | `@Value("${server.port:8080}")` |
+| **Mapping** | `BaseSettings` (Pydantic) | `@ConfigurationProperties` |
+
+```python
+# Python: os.environ or Pydantic Settings
+import os
+port = int(os.environ.get("SERVER_PORT", 8000))
+```
+
+```java
+// Java: @Value or Type-safe Config
+@RestController
+public class MyController {
+    @Value("${server.port:8080}")
+    private int port;
+}
+```
+
+---
+
 ## Interview Questions
 
 ### Conceptual

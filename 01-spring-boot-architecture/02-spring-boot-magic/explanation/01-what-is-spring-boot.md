@@ -54,6 +54,43 @@ mindmap
 
 ---
 
+## 4. Python vs. Java Code Comparison
+
+| Feature | Python (Django/FastAPI) | Java (Spring Boot) |
+|---|---|---|
+| **Entry Point** | `app = FastAPI()` | `@SpringBootApplication` |
+| **Server** | `uvicorn main:app` | `embedded Tomcat` (inside JAR) |
+| **Settings** | `settings.py` | `application.properties` |
+| **Philosophy** | Explicit Wiring | Convention over Configuration |
+
+```python
+# FastAPI (Explicit)
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/")
+def home():
+    return {"status": "ok"}
+```
+
+```java
+// Spring Boot (Conventional)
+@SpringBootApplication
+@RestController
+public class MainApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MainApp.class, args);
+    }
+
+    @GetMapping("/")
+    public Map<String, String> home() {
+        return Map.of("status", "ok");
+    }
+}
+```
+
+---
+
 ## Interview Questions
 
 ### Conceptual

@@ -1,0 +1,117 @@
+/*
+ * ============================================================================
+ * FILE: annotated-build.gradle
+ * PURPOSE: Fully annotated Spring Boot build.gradle with WHY for every line
+ * MODULE: 02-gradle-build-tool / 01-gradle-basics
+ * ============================================================================
+ *
+ * This file explains every section and line of a typical Spring Boot
+ * build.gradle file. Use this as a reference when building your own projects.
+ */
+
+// ============================================================================
+// PLUGINS BLOCK
+// ============================================================================
+// Plugins add tasks and conventions to your project.
+// The 'plugins' block is the modern way to apply plugins (replaces 'apply plugin:').
+plugins {
+    // 'java' plugin: Adds compileJava, test, jar, classes tasks.
+    // Without this, Gradle doesn't know how to compile Java code.
+    id 'java'
+
+    // 'org.springframework.boot': Adds bootRun, bootJar, bootBuildImage tasks.
+    // The version here determines your Spring Boot version for the ENTIRE project.
+    id 'org.springframework.boot' version '3.2.0'
+
+    // 'io.spring.dependency-management': Imports the Spring Boot BOM.
+    // This is WHY you can declare Spring dependencies without versions below.
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+// ============================================================================
+// PROJECT METADATA
+// ============================================================================
+// 'group' is equivalent to Python's package namespace (e.g., 'com.company').
+// 'version' is the project version (like __version__ in Python).
+// These become part of the JAR artifact name: group:artifact:version.
+group = 'com.learning'
+version = '1.0.0'
+
+// ============================================================================
+// JAVA CONFIGURATION
+// ============================================================================
+// Sets the Java language version for compilation and runtime.
+// Spring Boot 3.x requires Java 17+. We use Java 21 LTS.
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// ============================================================================
+// REPOSITORIES
+// ============================================================================
+// Repositories tell Gradle WHERE to download dependencies from.
+// Think of this as configuring pip to use PyPI (but Java has multiple registries).
+repositories {
+    // Maven Central: The primary public Java package registry.
+    // Contains 500,000+ libraries. Equivalent to PyPI for Python.
+    mavenCentral()
+
+    // Uncomment for snapshot/milestone versions (pre-release):
+    // maven { url 'https://repo.spring.io/milestone' }
+}
+
+// ============================================================================
+// DEPENDENCIES
+// ============================================================================
+// Dependencies are external libraries your project needs.
+// Each uses a SCOPE that controls when it's available.
+dependencies {
+    // --- IMPLEMENTATION: Available at compile + runtime ---
+
+    // Spring Boot Web Starter: Includes Spring MVC, embedded Tomcat, Jackson.
+    // This single dependency replaces 10+ individual library declarations.
+    // Python equivalent: pip install fastapi uvicorn pydantic
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Spring Boot Data JPA Starter: Includes Hibernate, Spring Data JPA.
+    // Python equivalent: pip install sqlalchemy alembic
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Spring Boot Validation Starter: Jakarta Bean Validation (like Pydantic).
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // --- RUNTIME ONLY: Available at runtime, NOT compile time ---
+
+    // PostgreSQL JDBC driver. Your code never imports driver classes directly.
+    // It's loaded at runtime via JDBC service discovery.
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // --- COMPILE ONLY: Available at compile time, NOT runtime ---
+
+    // Lombok: Generates getters/setters/constructors at compile time.
+    // The generated code exists in .class files, so Lombok jar isn't needed at runtime.
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // --- TEST IMPLEMENTATION: Available only during testing ---
+
+    // Spring Boot Test Starter: Includes JUnit 5, Mockito, Spring Test utilities.
+    // Python equivalent: pip install pytest pytest-mock
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// ============================================================================
+// TEST CONFIGURATION
+// ============================================================================
+// Configures how tests are run.
+test {
+    // Use JUnit 5 platform (JUnit Jupiter) instead of JUnit 4.
+    // This is REQUIRED for Spring Boot 3.x test support.
+    useJUnitPlatform()
+
+    // Show test output in the console (helpful during development).
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}

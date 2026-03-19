@@ -1,0 +1,84 @@
+/*
+ * ============================================================================
+ * FILE: Ex01_CustomBuildFile.gradle
+ * PURPOSE: Exercise — Build your own build.gradle from scratch
+ * MODULE: 02-gradle-build-tool / 01-gradle-basics / exercises
+ * DIFFICULTY: Beginner
+ * ============================================================================
+ *
+ * EXERCISE INSTRUCTIONS:
+ * =====================
+ * You are tasked with creating a build.gradle for a new Spring Boot project.
+ * Follow the TODOs below to complete each section.
+ *
+ * Python Comparison:
+ * This is equivalent to creating a pyproject.toml for a new FastAPI project,
+ * but with much more granular control over the build pipeline.
+ *
+ * VERIFICATION:
+ * After completing, run: ./gradlew build --dry-run
+ * If there are no errors, your configuration is correct.
+ */
+
+// ============================================================================
+// TODO 1: Apply Plugins
+// ============================================================================
+// Apply three plugins:
+//   - 'java' (no version needed — it's a core Gradle plugin)
+//   - 'org.springframework.boot' version '3.2.0'
+//   - 'io.spring.dependency-management' version '1.1.4'
+//
+// Hint: Use the 'plugins { }' block syntax.
+// Python equivalent: Adding [build-system] to pyproject.toml.
+plugins {
+    // YOUR CODE HERE
+}
+
+// ============================================================================
+// TODO 2: Set Project Metadata
+// ============================================================================
+// Set the following:
+//   - group = 'com.learning.exercises'
+//   - version = '0.1.0'
+//   - Java source/target compatibility = Java 21
+//
+// Hint: Use the 'java { }' block for compatibility settings.
+// Python equivalent: Setting name, version in pyproject.toml.
+
+// YOUR CODE HERE
+
+// ============================================================================
+// TODO 3: Configure Repositories
+// ============================================================================
+// Add Maven Central as the dependency repository.
+//
+// Hint: repositories { mavenCentral() }
+// Python equivalent: pip uses PyPI by default.
+repositories {
+    // YOUR CODE HERE
+}
+
+// ============================================================================
+// TODO 4: Declare Dependencies
+// ============================================================================
+// Add the following dependencies with CORRECT scopes:
+//   1. spring-boot-starter-web          → implementation (no version)
+//   2. spring-boot-starter-data-jpa     → implementation (no version)
+//   3. postgresql                        → runtimeOnly (no version)
+//   4. lombok                            → compileOnly + annotationProcessor (no version)
+//   5. spring-boot-starter-test          → testImplementation (no version)
+//
+// Think about WHY each scope is correct before writing it.
+dependencies {
+    // YOUR CODE HERE
+}
+
+// ============================================================================
+// TODO 5: Configure Test Framework
+// ============================================================================
+// Configure the test task to use JUnit 5 (JUnit Platform).
+//
+// Hint: test { useJUnitPlatform() }
+// Python equivalent: [tool.pytest.ini_options] in pyproject.toml.
+
+// YOUR CODE HERE

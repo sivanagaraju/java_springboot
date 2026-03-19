@@ -1,15 +1,19 @@
-# Advanced Data Access: Relationships & Transactions
+# 02 — Advanced JPA
 
 ## Overview
-This module takes your JPA architectural knowledge to the next level by teaching you how to physically map SQL Foreign Keys using Java logic (`@OneToMany`, `@ManyToOne`) and ensuring data integrity seamlessly using Database Transactions (`@Transactional`).
 
-## Core Concepts
-- **Foreign Keys in Java:** The difference between the "Owner" of a relationship (the table that has the physical foreign key column) and the "Inverse" side (the Java object that merely holds a List).
-- **The N+1 Query Problem:** Understanding why `FetchType.LAZY` and `EAGER` dictate database query storms.
-- **Transactions:** The core concept of ACID properties seamlessly implemented securely intuitively seamlessly magically functionally dependably reliably cleanly smoothly wonderfully safely creatively logically fluid effectively smoothly creatively intelligently cleanly identically securely natively neatly explicitly safely effectively.
-- *Correction:* The core concept of ACID properties implemented by intercepting methods securely.
-- **`@Transactional` Under the Hood:** Understanding how Spring dynamically creates a Proxy class that wraps your business method with exactly `connection.setAutoCommit(false)` and `connection.commit()` organically flawlessly smoothly fluently dynamically.
+This sub-module covers the advanced JPA patterns that separate junior developers from senior engineers: entity relationships (`@OneToMany`, `@ManyToMany`), transaction management (`@Transactional`), and performance optimization (N+1 problem, fetch strategies).
+
+## Core Concepts Covered
+
+1. **Entity Relationships** — `@OneToOne`, `@OneToMany`, `@ManyToOne`, `@ManyToMany`, cascade types, fetch strategies
+2. **Understanding Transactions** — `@Transactional`, propagation types, isolation levels, rollback behavior
 
 ## Structure
-- `explanation/`: Deep dives into advanced mappings and proxy interceptors cleanly securely wonderfully natively logically nicely safely cleanly thoughtfully reliably automatically elegantly.
-- `exercises/`: Coding challenges testing your bi-directional relationships mapping fluently intuitively successfully smoothly cleanly dependably smartly perfectly.
+
+- `explanation/` — Deep-dive markdown files for each advanced concept
+- `exercises/` — Hands-on tasks to implement relationships and transactions
+
+## Mindmap
+
+See [MINDMAP.md](MINDMAP.md) for a visual overview of advanced JPA concepts.

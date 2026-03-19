@@ -1,77 +1,348 @@
-package explanation;
+/**
+ * ╔══════════════════════════════════════════════════════════════════╗
+ * ║  FILE   : JpaDemo.java                                          ║
+ * ║  MODULE : 02-data-access / 01-spring-data-jpa                   ║
+ * ║  GRADLE : ./gradlew :02-data-access:run                         ║
+ * ╠══════════════════════════════════════════════════════════════════╣
+ * ║  PURPOSE        : Demonstrates core Spring Data JPA patterns    ║
+ * ║                   — entities, repositories, service-layer usage  ║
+ * ║  WHY IT EXISTS  : Before JPA, every SQL query required 15+      ║
+ * ║                   lines of JDBC boilerplate. JPA reduces CRUD    ║
+ * ║                   to zero implementation code via repositories.  ║
+ * ║  PYTHON COMPARE : SQLAlchemy model + crud.py functions           ║
+ * ║                   → JPA Entity + JpaRepository interface         ║
+ * ║  USE CASES      : 1) Product catalog CRUD                       ║
+ * ║                   2) Search with derived queries                 ║
+ * ║                   3) Soft-delete via dirty checking              ║
+ * ║                   4) Repository auto-generation at startup       ║
+ * ╠══════════════════════════════════════════════════════════════════╣
+ * ║  ASCII DIAGRAM — Spring Data JPA Architecture                    ║
+ * ║                                                                   ║
+ * ║    Service Layer                                                  ║
+ * ║        │                                                          ║
+ * ║        ▼                                                          ║
+ * ║    [ ProductRepository ]  ← Interface only (you write this)      ║
+ * ║        │                                                          ║
+ * ║        ▼                                                          ║
+ * ║    [ SimpleJpaRepository ]← Auto-generated proxy (Spring writes) ║
+ * ║        │                                                          ║
+ * ║        ▼                                                          ║
+ * ║    [ EntityManager ]      ← JPA standard API                     ║
+ * ║        │                                                          ║
+ * ║        ▼                                                          ║
+ * ║    [ Hibernate ]          ← JPA implementation                   ║
+ * ║        │                                                          ║
+ * ║        ▼                                                          ║
+ * ║    [ JDBC / HikariCP ]    ← Connection pool                     ║
+ * ║        │                                                          ║
+ * ║        ▼                                                          ║
+ * ║    [ PostgreSQL ]         ← Database                             ║
+ * ║                                                                   ║
+ * ╠══════════════════════════════════════════════════════════════════╣
+ * ║  HOW TO RUN     : Conceptual demo — patterns only               ║
+ * ║  EXPECTED OUTPUT: N/A (not standalone-runnable)                  ║
+ * ║  RELATED FILES  : 01-what-is-jpa.md, 02-entities-and-           ║
+ * ║                   annotations.md, 03-spring-data-repositories.md ║
+ * ╚══════════════════════════════════════════════════════════════════╝
+ */
 
+// --- PART 1: ENTITY DEFINITION ---
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.List;
 
 /**
- * DEMO: How JPA conceptually links Java Objects to Database Operations
- * 
- * NOTE: This is pseudo-code demonstrating the API. To run this natively,
- * passing this code through a real Spring Boot Container + H2 Database is required.
+ * Product entity representing the 'products' table in the database.
+ *
+ * <p><b>Layer responsibility:</b> Maps a Java object to a database row.
+ * JPA handles the Object↔Relational translation automatically.
+ *
+ * <p><b>Python equivalent:</b>
+ * <pre>
+ *   class Product(Base):
+ *       __tablename__ = "products"
+ *       id = Column(Integer, primary_key=True, autoincrement=True)
+ *       name = Column(String(200), nullable=False)
+ *       price_in_cents = Column(Integer, nullable=False)
+ *       category = Column(Enum(ProductCategory))
+ * </pre>
+ *
+ * <p><b>ASCII — Entity Lifecycle States:</b>
+ * <pre>
+ *   [ NEW ]                    ← Java object, not yet managed
+ *       │ persist()
+ *       ▼
+ *   [ MANAGED ]               ← Tracked by EntityManager
+ *       │ flush/commit             changes auto-detected (dirty checking)
+ *       ▼
+ *   [ DB ROW ]                ← Persisted in database
+ *       │ detach/close
+ *       ▼
+ *   [ DETACHED ]              ← No longer tracked, changes ignored
+ *       │ merge()
+ *       ▼
+ *   [ MANAGED ] again         ← Re-attached, changes tracked
+ * </pre>
  */
-public class JpaDemo {
+@Entity
+@Table(name = "products")
+class Product {
 
-    public static void main(String[] args) {
-        System.out.println("--- Spring Data JPA Engine Simulator ---");
-        
-        // Imagine: Spring IoC automatically injects the interface proxy here.
-        UserRepository repository = getSimulatedProxy();
+    /** Primary key — auto-generated by the database (PostgreSQL SERIAL). */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        // 1. CREATE
-        System.out.println("\n[Saving] Translates to: INSERT INTO users (name, email) VALUES ...");
-        User alice = new User(null, "Alice", "alice@test.com");
-        repository.save(alice); // Hibernate populates the Auto-Incremented ID on this physical object now!
+    /** Product name — required, max 200 characters. */
+    @Column(nullable = false, length = 200)
+    private String name;
 
-        // 2. READ (Derived Query Method)
-        System.out.println("\n[Querying] Translates to: SELECT * FROM users WHERE email = 'bob@test.com'");
-        Optional<User> bob = repository.findByEmail("bob@test.com");
-        
-        if (bob.isPresent()) {
-            System.out.println("Found Bob: " + bob.get().getName());
-        } else {
-            System.out.println("Bob not found.");
-        }
+    /** Product description — optional, stored as TEXT for unlimited length. */
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    /** Price in cents — avoids floating-point precision issues. */
+    @Column(nullable = false)
+    private Integer priceInCents;
+
+    /** Product category — stored as string, not ordinal (safe for reordering). */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProductCategory category;
+
+    /** Whether this product is available for purchase. */
+    @Column(nullable = false)
+    private boolean active = true;
+
+    /**
+     * Creation timestamp — set automatically via @PrePersist lifecycle callback.
+     * Python equivalent: Column(DateTime, default=func.now())
+     */
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    // JPA lifecycle callback — runs before INSERT
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    // --- Entity ---
-    public static class User {
-        private Long id; // @Id @GeneratedValue
-        private String name;
-        private String email;
+    // JPA requires a no-arg constructor (can be protected)
+    protected Product() {}
 
-        public User(Long id, String name, String email) {
-            this.id = id;
-            this.name = name;
-            this.email = email;
-        }
-
-        public String getName() { return name; }
+    // Business constructor
+    public Product(String name, String description, Integer priceInCents, ProductCategory category) {
+        this.name = name;
+        this.description = description;
+        this.priceInCents = priceInCents;
+        this.category = category;
     }
 
-    // --- Interface ---
-    public interface UserRepository {
-        // Built-in methods conceptually from JpaRepository
-        void save(User entity);
-        Optional<User> findById(Long id);
-        
-        // Derived Method conceptually parsed by Spring
-        Optional<User> findByEmail(String email);
+    // Getters and setters (use Lombok @Data in real projects)
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Integer getPriceInCents() { return priceInCents; }
+    public void setPriceInCents(Integer priceInCents) { this.priceInCents = priceInCents; }
+    public ProductCategory getCategory() { return category; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+}
+
+/** Product category enum — stored as STRING in the database. */
+enum ProductCategory {
+    ELECTRONICS, BOOKS, CLOTHING, FOOD, HOME
+}
+
+
+// --- PART 2: REPOSITORY INTERFACE ---
+
+/**
+ * Repository interface for Product entities.
+ * Spring Data JPA generates the ENTIRE implementation at startup.
+ *
+ * <p><b>Python equivalent:</b> You would write ~50 lines of CRUD functions
+ * in crud.py. Here you write ZERO implementation code.
+ *
+ * <p><b>ASCII — What Spring generates behind the scenes:</b>
+ * <pre>
+ *   You write:          Spring generates:
+ *   ┌──────────────┐    ┌──────────────────────────┐
+ *   │ interface     │    │ class $$Proxy extends    │
+ *   │ ProductRepo   │───→│ SimpleJpaRepository      │
+ *   │ extends       │    │ implements ProductRepo   │
+ *   │ JpaRepository │    │ {                        │
+ *   │ { }           │    │   save() { em.merge() }  │
+ *   └──────────────┘    │   findById() { em.find }  │
+ *                        │   findAll() { em.query }  │
+ *                        │   ...15+ methods...       │
+ *                        └──────────────────────────┘
+ * </pre>
+ */
+interface ProductRepository extends JpaRepository<Product, Long> {
+
+    /**
+     * Find all products in a specific category.
+     * Generated SQL: SELECT * FROM products WHERE category = ?
+     *
+     * Python equivalent:
+     *   db.query(Product).filter(Product.category == category).all()
+     */
+    List<Product> findByCategory(ProductCategory category);
+
+    /**
+     * Find active products with name containing the search term (case-insensitive).
+     *
+     * <p><b>ASCII — Query derivation:</b>
+     * <pre>
+     *   Method name: findByActiveTrueAndNameContainingIgnoreCase
+     *       │
+     *       ├── findBy          → SELECT
+     *       ├── ActiveTrue      → WHERE active = true
+     *       ├── And             → AND
+     *       └── NameContaining  → name LIKE %?%
+     *           IgnoreCase      → LOWER(name) LIKE LOWER(?)
+     * </pre>
+     */
+    List<Product> findByActiveTrueAndNameContainingIgnoreCase(String search);
+
+    /** Find the top 5 most expensive products. */
+    List<Product> findTop5ByOrderByPriceInCentsDesc();
+
+    /** Check if a product exists with the given name. */
+    boolean existsByName(String name);
+
+    /** Count products by category. */
+    long countByCategory(ProductCategory category);
+}
+
+
+// --- PART 3: SERVICE LAYER ---
+
+/**
+ * Service class that uses ProductRepository for business operations.
+ *
+ * <p><b>Layer responsibility:</b> Contains business rules. Never talks to HTTP
+ * (Controller's job) or directly to DB SQL (Repository's job).
+ *
+ * <p><b>Python equivalent:</b>
+ * <pre>
+ *   # In FastAPI, this is a combination of route + business logic.
+ *   # Spring separates them: Controller handles HTTP, Service handles logic.
+ *   def create_product(db: Session, name: str, price: int) -> Product:
+ *       product = Product(name=name, price=price)
+ *       db.add(product)
+ *       db.commit()
+ *       return product
+ * </pre>
+ *
+ * <p><b>ASCII — Layered Architecture:</b>
+ * <pre>
+ *   HTTP Request
+ *       │
+ *       ▼
+ *   [ ProductController ]   ← validates input, maps DTO↔Entity
+ *       │
+ *       ▼
+ *   [ ProductService ]      ← business rules  ← YOU ARE HERE
+ *       │
+ *       ▼
+ *   [ ProductRepository ]   ← auto-generated CRUD
+ *       │
+ *       ▼
+ *   [ PostgreSQL ]
+ * </pre>
+ */
+@Service
+class ProductService {
+
+    private final ProductRepository productRepository;
+
+    /**
+     * Constructor injection — Spring injects the auto-generated repository proxy.
+     * Python equivalent: Depends(get_db) in FastAPI.
+     */
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
-    // Proxy Simulator mimicking what Spring generates at Startup
-    public static UserRepository getSimulatedProxy() {
-        return new UserRepository() {
-            public void save(User entity) {
-                System.out.println("Hibernate Engine inserting User object into DB...");
-            }
-            public Optional<User> findById(Long id) {
-                return Optional.empty();
-            }
-            public Optional<User> findByEmail(String email) {
-                if (email.equals("bob@test.com")) {
-                    return Optional.of(new User(2L, "Bob", email));
-                }
-                return Optional.empty();
-            }
-        };
+    /**
+     * Creates a new product and persists it to the database.
+     *
+     * <p><b>Flow:</b>
+     * <pre>
+     *   createProduct(name, desc, price, category)
+     *       │
+     *       ▼
+     *   new Product(...)        ← Java object (NEW state)
+     *       │
+     *       ▼
+     *   repository.save(p)      ← id == null → INSERT
+     *       │
+     *       ▼
+     *   Product with id=42      ← DB generated ID assigned
+     * </pre>
+     *
+     * @param name          product name
+     * @param description   product description
+     * @param priceInCents  price in cents (avoids float precision issues)
+     * @param category      product category enum
+     * @return the saved product with generated ID and timestamp
+     */
+    @Transactional
+    public Product createProduct(String name, String description,
+                                  Integer priceInCents, ProductCategory category) {
+        // save() detects id == null → executes INSERT
+        return productRepository.save(
+            new Product(name, description, priceInCents, category)
+        );
+    }
+
+    /**
+     * Finds a product by ID, returning Optional to handle "not found" safely.
+     *
+     * <p><b>Python equivalent:</b>
+     * <pre>
+     *   product = db.query(Product).get(id)
+     *   if not product:
+     *       raise HTTPException(404)
+     * </pre>
+     */
+    public Optional<Product> findProduct(Long id) {
+        return productRepository.findById(id);
+    }
+
+    /**
+     * Searches for active products by name (case-insensitive partial match).
+     */
+    public List<Product> searchProducts(String query) {
+        return productRepository.findByActiveTrueAndNameContainingIgnoreCase(query);
+    }
+
+    /**
+     * Soft-deletes a product by setting active = false.
+     *
+     * <p><b>ASCII — Dirty Checking (no explicit save needed):</b>
+     * <pre>
+     *   findById(id)
+     *       │
+     *       ▼
+     *   product.setActive(false)   ← field changed in MANAGED entity
+     *       │
+     *       ▼
+     *   @Transactional commit      ← JPA detects dirty field
+     *       │
+     *       ▼
+     *   UPDATE products SET active=false WHERE id=?   ← auto-generated
+     * </pre>
+     */
+    @Transactional
+    public void softDelete(Long id) {
+        productRepository.findById(id).ifPresent(product -> {
+            product.setActive(false);
+            // No need to call save() — JPA dirty checking handles the UPDATE!
+        });
     }
 }

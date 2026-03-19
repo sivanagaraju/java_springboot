@@ -1,0 +1,105 @@
+/*
+ * ============================================================================
+ * FILE: Ex02_MultiModuleSetup.gradle
+ * PURPOSE: Exercise — Configure a multi-module Gradle project
+ * MODULE: 02-gradle-build-tool / 01-gradle-basics / exercises
+ * DIFFICULTY: Intermediate
+ * ============================================================================
+ *
+ * EXERCISE INSTRUCTIONS:
+ * =====================
+ * You are the tech lead setting up a multi-module Spring Boot project with
+ * three modules: common-lib, api-gateway, and user-service.
+ *
+ * Complete BOTH this file (root build.gradle) AND the settings.gradle below.
+ *
+ * Python Comparison:
+ * This is equivalent to setting up a Python monorepo with shared packages,
+ * but Gradle provides native support unlike Python's fragmented tooling.
+ *
+ * VERIFICATION:
+ * Run: ./gradlew projects
+ * You should see all 3 sub-projects listed.
+ */
+
+// ============================================================================
+// TODO 1: Root Build File — Shared Configuration
+// ============================================================================
+// Use allprojects { } to set:
+//   - group = 'com.learning.multimodule'
+//   - version = '1.0.0'
+//   - repositories: mavenCentral()
+//
+// Use subprojects { } to:
+//   - Apply the 'java' plugin
+//   - Set Java 21 compatibility
+//   - Add JUnit 5 testImplementation dependency
+//   - Configure test to use JUnit Platform
+
+allprojects {
+    // YOUR CODE HERE
+}
+
+subprojects {
+    // YOUR CODE HERE
+}
+
+// ============================================================================
+// TODO 2: Settings File (create as a separate file: settings.gradle)
+// ============================================================================
+// In a real project, create a settings.gradle file with:
+//
+//   rootProject.name = 'multi-module-exercise'
+//   include 'common-lib'
+//   include 'api-gateway'
+//   include 'user-service'
+//
+// This tells Gradle which directories are sub-projects.
+
+// ============================================================================
+// TODO 3: Module-Specific Build File (common-lib/build.gradle)
+// ============================================================================
+// In common-lib/build.gradle, add:
+//
+//   dependencies {
+//       implementation 'com.google.guava:guava:32.1.3-jre'
+//   }
+//
+// This module has NO Spring Boot dependency — it's a pure Java library.
+
+// ============================================================================
+// TODO 4: Module-Specific Build File (api-gateway/build.gradle)
+// ============================================================================
+// In api-gateway/build.gradle, add:
+//
+//   plugins {
+//       id 'org.springframework.boot' version '3.2.0'
+//       id 'io.spring.dependency-management' version '1.1.4'
+//   }
+//
+//   dependencies {
+//       implementation project(':common-lib')   // Inter-module dependency!
+//       implementation 'org.springframework.boot:spring-boot-starter-web'
+//   }
+
+// ============================================================================
+// TODO 5: Module-Specific Build File (user-service/build.gradle)
+// ============================================================================
+// In user-service/build.gradle, add:
+//
+//   plugins {
+//       id 'org.springframework.boot' version '3.2.0'
+//       id 'io.spring.dependency-management' version '1.1.4'
+//   }
+//
+//   dependencies {
+//       implementation project(':common-lib')   // Also depends on common-lib
+//       implementation 'org.springframework.boot:spring-boot-starter-web'
+//       implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//       runtimeOnly 'org.postgresql:postgresql'
+//   }
+
+// ============================================================================
+// CHALLENGE: Draw the dependency graph for this multi-module project.
+// Which module is built first? Which is built last? Why?
+// ============================================================================

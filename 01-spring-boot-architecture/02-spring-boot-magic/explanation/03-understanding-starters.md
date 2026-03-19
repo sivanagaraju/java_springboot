@@ -62,6 +62,32 @@ graph TD
 
 ---
 
+## 4. Python vs. Java Code Comparison
+
+| Goal | Python (requirements.txt) | Java (Spring Starter) |
+|---|---|---|
+| **Web App** | `fastapi`, `uvicorn`, `pydantic` | `spring-boot-starter-web` |
+| **Database** | `sqlalchemy`, `psycopg2`, `alembic` | `spring-boot-starter-data-jpa` |
+| **Testing** | `pytest`, `pytest-mock`, `httpx` | `spring-boot-starter-test` |
+
+```text
+# requirements.txt (Explicit list)
+fastapi==0.109.0
+uvicorn==0.27.0
+pydantic==2.5.3
+# Must manage versions manually!
+```
+
+```gradle
+// build.gradle (One starter = dozens of aligned libs)
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Versions managed by Spring Parent BOM automatically!
+}
+```
+
+---
+
 ## Interview Questions
 
 ### Conceptual

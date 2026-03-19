@@ -1,0 +1,56 @@
+# Hibernate & JPA Mindmap
+
+- Hibernate & JPA
+  - ORM Concept
+    - Object-Relational Mapping
+    - Entity = Java class that maps to a DB table
+    - Session = unit of work (conversation with DB)
+    - Python: SQLAlchemy declarative_base() + Session
+  - Entity Annotations
+    - @Entity (marks class as persistent)
+    - @Table (configures table name)
+    - @Id + @GeneratedValue (primary key)
+    - @Column (field-to-column mapping)
+    - @Enumerated (enum mapping)
+    - @Temporal (date/time before Java 8)
+    - @Transient (not persisted)
+  - Hibernate Architecture
+    - SessionFactory (heavy, one per app)
+    - Session (lightweight, one per request)
+    - Transaction (wraps JDBC transaction)
+    - Entity lifecycle states
+      - Transient → Persistent → Detached → Removed
+  - CRUD Operations
+    - persist() = INSERT
+    - find() = SELECT by PK
+    - merge() = UPDATE
+    - remove() = DELETE
+  - Relationships
+    - @OneToOne (User ↔ Address)
+    - @OneToMany (Department → Employees)
+    - @ManyToOne (Employee → Department)
+    - @ManyToMany (Student ↔ Course)
+    - Cascade types (ALL, PERSIST, MERGE, REMOVE)
+    - Fetch strategies (LAZY vs EAGER)
+    - N+1 problem and solutions
+  - HQL / JPQL
+    - Object-oriented SQL
+    - Named queries (@NamedQuery)
+    - Native SQL queries
+  - Criteria API
+    - Type-safe queries
+    - CriteriaBuilder, CriteriaQuery, Root
+    - Dynamic query construction
+  - Caching
+    - First-level cache (Session-scoped, automatic)
+    - Second-level cache (SessionFactory-scoped, opt-in)
+    - Query cache (result-set caching)
+    - Cache providers (Ehcache, Caffeine)
+  - Locking
+    - Optimistic (@Version field)
+    - Pessimistic (SELECT FOR UPDATE)
+    - When to use which
+  - Inheritance Mapping
+    - SINGLE_TABLE (default, one table for hierarchy)
+    - TABLE_PER_CLASS (one table per concrete class)
+    - JOINED (normalized, one table per class)

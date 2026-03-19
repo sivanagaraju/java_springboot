@@ -1,0 +1,53 @@
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  MINI-PROJECT : 03-employee-jdbc                                   ║
+// ║  PURPOSE : Complete CRUD application using raw JDBC + HikariCP     ║
+// ║  RUN     : ./gradlew :03-jdbc:mini-project-03-employee-jdbc:run   ║
+// ║  TEST    : ./gradlew :03-jdbc:mini-project-03-employee-jdbc:test  ║
+// ╠═══════════════════════════════════════════════════════════════════╣
+// ║                                                                    ║
+// ║  Architecture:                                                     ║
+// ║                                                                    ║
+// ║  Main.java                                                         ║
+// ║      │                                                             ║
+// ║      ▼                                                             ║
+// ║  EmployeeDao.java  ← All SQL lives here (DAO pattern)             ║
+// ║      │                                                             ║
+// ║      ▼                                                             ║
+// ║  DatabaseConfig.java  ← HikariCP pool (singleton)                 ║
+// ║      │                                                             ║
+// ║      ▼                                                             ║
+// ║  PostgreSQL                                                        ║
+// ║                                                                    ║
+// ║  Python equivalent:                                                ║
+// ║    main.py → repository.py → engine = create_engine(url)          ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+
+plugins {
+    id 'java'
+    id 'application'
+}
+
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // PostgreSQL JDBC driver
+    implementation 'org.postgresql:postgresql:42.7.2'
+
+    // HikariCP connection pool
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+
+    // SLF4J logging for HikariCP
+    implementation 'org.slf4j:slf4j-simple:2.0.12'
+}
+
+application {
+    mainClass = 'com.springmastery.jdbc.miniproject.Main'
+}
+
+tasks.named('run') {
+    standardInput = System.in
+}

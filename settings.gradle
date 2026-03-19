@@ -1,1 +1,20 @@
-include '01-spring-boot-architecture'
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  SETTINGS — Spring Mastery Multi-Module Project                    ║
+// ║  PURPOSE : Declares all Gradle subprojects in this monorepo       ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+
+rootProject.name = 'spring-mastery'
+
+// ── Module 00: Java Foundation ─────────────────────────────────────
+include '00-java-foundation'
+include '00-java-foundation:mini-project-01-student-manager'
+
+// ── Module 01: Advanced Java ───────────────────────────────────────
+include '01-advanced-java'
+
+// ── Module 02: Gradle Build Tool ───────────────────────────────────
+// (No build.gradle needed — explanation-only module with .gradle exercises)
+
+// ── Module 03: JDBC ────────────────────────────────────────────────
+include '03-jdbc'
+include '03-jdbc:mini-project-03-employee-jdbc'

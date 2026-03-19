@@ -1,0 +1,69 @@
+/*
+ * ============================================================================
+ * FILE: annotated-settings.gradle
+ * PURPOSE: Fully annotated settings.gradle for multi-module projects
+ * MODULE: 02-gradle-build-tool / 01-gradle-basics
+ * ============================================================================
+ *
+ * The settings.gradle file is read during the INITIALIZATION phase of the
+ * Gradle build lifecycle. It tells Gradle:
+ *   1. What is this project called?
+ *   2. Which sub-directories are Gradle modules?
+ *
+ * Python equivalent: Think of this as the workspace configuration in a monorepo.
+ * There is no direct Python equivalent — the closest is a root pyproject.toml
+ * in a Poetry workspace or a pants.toml in a Pants monorepo.
+ */
+
+// ============================================================================
+// ROOT PROJECT NAME
+// ============================================================================
+// This sets the name of the root project. It determines:
+//   - The name of the generated JAR/WAR artifact.
+//   - The project reference when other projects depend on it.
+//
+// If you don't set this, Gradle uses the directory name by default.
+rootProject.name = 'spring-mastery'
+
+// ============================================================================
+// MODULE INCLUDES
+// ============================================================================
+// Each 'include' statement tells Gradle: "This directory contains a Gradle project."
+// Each included module MUST have its own build.gradle file.
+//
+// After include, you reference modules using ':module-name' syntax:
+//   implementation project(':common-lib')
+//   ./gradlew :web-app:build
+
+include 'common-lib'        // Shared utility classes, DTOs, exceptions
+include 'web-app'            // Spring Boot web application (REST API)
+include 'batch-processor'    // Background job processor
+
+// ============================================================================
+// NESTED MODULES (ADVANCED)
+// ============================================================================
+// For deeply nested module structures:
+//   include 'services:user-service'
+//   include 'services:order-service'
+//
+// This creates:
+//   services/
+//   ├── user-service/
+//   │   └── build.gradle
+//   └── order-service/
+//       └── build.gradle
+//
+// Reference: implementation project(':services:user-service')
+
+// ============================================================================
+// PLUGIN MANAGEMENT (ADVANCED)
+// ============================================================================
+// Uncomment to configure plugin repositories and version catalogs.
+// This is useful in enterprise environments with private plugin repositories.
+//
+// pluginManagement {
+//     repositories {
+//         gradlePluginPortal()  // Default: Gradle Plugin Portal
+//         mavenCentral()
+//     }
+// }

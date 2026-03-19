@@ -1,0 +1,44 @@
+/*
+ * ╔══════════════════════════════════════════════════════════════════╗
+ * ║  BUILD — Module 01: Advanced Java                              ║
+ * ║  Java 21 LTS | JUnit 5 | Application plugin                   ║
+ * ╠══════════════════════════════════════════════════════════════════╣
+ * ║                                                                ║
+ * ║  Sub-topics:                                                   ║
+ * ║   01-design-patterns   — GOF + modern patterns                 ║
+ * ║   02-file-io           — NIO.2, serialization                  ║
+ * ║   03-java-new-features — Records, sealed, pattern matching     ║
+ * ║                                                                ║
+ * ║  Python equivalent:                                            ║
+ * ║    # No build system — just `python script.py`                 ║
+ * ║    # requirements.txt or pyproject.toml for deps               ║
+ * ╚══════════════════════════════════════════════════════════════════╝
+ */
+
+plugins {
+    id 'java'
+    id 'application'
+}
+
+// ── Java 21 LTS ──────────────────────────────────────────────────
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// ── Dependencies ─────────────────────────────────────────────────
+dependencies {
+    // JUnit 5 for testing
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// ── Test Configuration ───────────────────────────────────────────
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// ── Compiler Options ─────────────────────────────────────────────
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

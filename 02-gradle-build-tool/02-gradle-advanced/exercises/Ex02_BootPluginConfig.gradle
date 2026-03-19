@@ -1,0 +1,112 @@
+/*
+ * ============================================================================
+ * FILE: Ex02_BootPluginConfig.gradle
+ * PURPOSE: Exercise — Configure Spring Boot Gradle Plugin for multi-env deployment
+ * MODULE: 02-gradle-build-tool / 02-gradle-advanced / exercises
+ * DIFFICULTY: Advanced
+ * ============================================================================
+ *
+ * EXERCISE INSTRUCTIONS:
+ * =====================
+ * Configure a Spring Boot project for three environments: dev, staging, prod.
+ * Each environment has different JVM settings, Spring profiles, and Docker image tags.
+ *
+ * Python Comparison:
+ * This is equivalent to having .env.development, .env.staging, .env.production
+ * files in a FastAPI project, but with compile-time configuration via Gradle.
+ *
+ * VERIFICATION:
+ * Run: ./gradlew bootRun                    → Should use dev profile
+ * Run: ./gradlew bootRun -Pprofile=prod     → Should use prod profile
+ * Run: ./gradlew bootBuildImage -Penv=prod  → Should tag as :prod-1.0.0
+ */
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.learning.exercises'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// ============================================================================
+// TODO 1: Configure bootRun with Environment-Specific Settings
+// ============================================================================
+// Configure bootRun to:
+//   - Read 'profile' from Gradle properties (default to 'dev')
+//   - Set spring.profiles.active to the profile value
+//   - Set JVM args based on environment:
+//       dev:  -Xms256m -Xmx512m
+//       prod: -Xms1g -Xmx2g -XX:+UseG1GC
+//
+// Hint: def profile = findProperty('profile') ?: 'dev'
+
+bootRun {
+    // YOUR CODE HERE
+}
+
+// ============================================================================
+// TODO 2: Configure bootJar with Version Information
+// ============================================================================
+// Configure bootJar to:
+//   - Include a manifest attribute: 'Implementation-Version' = project.version
+//   - Archive file name: "${project.name}-${project.version}.jar"
+
+bootJar {
+    // YOUR CODE HERE
+}
+
+// ============================================================================
+// TODO 3: Configure bootBuildImage for Docker
+// ============================================================================
+// Configure bootBuildImage to:
+//   - Read 'env' from Gradle properties (default to 'dev')
+//   - Set image name: "learning/${project.name}:${env}-${project.version}"
+//   - Set BP_JVM_VERSION to '21'
+//
+// Test: ./gradlew bootBuildImage -Penv=staging
+// Expected image: learning/exercise:staging-1.0.0
+
+bootBuildImage {
+    // YOUR CODE HERE
+}
+
+// ============================================================================
+// TODO 4: Add a Library Module Configuration
+// ============================================================================
+// Imagine you add a 'common-lib' sub-project.
+// In common-lib/build.gradle, you would need:
+//   jar { enabled = true }
+//   bootJar { enabled = false }
+//
+// WHY? Because common-lib has no main() method — it's not executable.
+// The Spring Boot plugin's bootJar would fail trying to find a main class.
+
+// ============================================================================
+// CHALLENGE: Create a task that prints the final Docker image tag
+// ============================================================================
+// Create a task 'printDockerTag' that prints the image name that
+// bootBuildImage would use, WITHOUT actually building the image.
+// Hint: Read the imageName property from bootBuildImage configuration.
+
+// YOUR CODE HERE
+
+test {
+    useJUnitPlatform()
+}

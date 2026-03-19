@@ -1,0 +1,43 @@
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  ROOT BUILD — Spring Mastery Learning Repository                  ║
+// ║  PURPOSE : Shared configuration for all modules in this monorepo  ║
+// ║  RUN     : ./gradlew :<module>:run (e.g., :03-jdbc:run)          ║
+// ║  TEST    : ./gradlew test (all modules) or :module:test           ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+
+// ── Root project does not produce its own artifacts ────────────────
+// This file configures shared settings inherited by all subprojects.
+
+allprojects {
+    group = 'com.springmastery'
+    version = '0.0.1-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    // ── Java 21 LTS — enforced across all modules ──────────────────
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    // ── Common test dependencies ───────────────────────────────────
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+    // ── UTF-8 encoding for all Java compilation ────────────────────
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+}

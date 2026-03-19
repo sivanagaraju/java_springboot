@@ -1,0 +1,83 @@
+/*
+ * ============================================================================
+ * FILE: Ex01_CustomTask.gradle
+ * PURPOSE: Exercise — Write custom Gradle tasks with incremental build support
+ * MODULE: 02-gradle-build-tool / 02-gradle-advanced / exercises
+ * DIFFICULTY: Intermediate
+ * ============================================================================
+ *
+ * EXERCISE INSTRUCTIONS:
+ * =====================
+ * Create three custom Gradle tasks that demonstrate different patterns:
+ *   1. A simple task that prints build information
+ *   2. A task with inputs/outputs for incremental builds
+ *   3. A task that depends on the others
+ *
+ * Python Comparison:
+ * Each task is equivalent to a 'make' target or an 'invoke' task
+ * in the Python ecosystem, but with built-in caching via inputs/outputs.
+ *
+ * VERIFICATION:
+ * Run: ./gradlew showBuildInfo
+ * Run: ./gradlew generateBuildReport
+ * Run: ./gradlew fullReport
+ * Then run ./gradlew fullReport again — observe which tasks are UP-TO-DATE.
+ */
+
+plugins {
+    id 'java'
+}
+
+group = 'com.learning.exercises'
+version = '1.0.0'
+
+// ============================================================================
+// TODO 1: Simple Information Task
+// ============================================================================
+// Create a task called 'showBuildInfo' that:
+//   - Has description = 'Shows current build environment info'
+//   - Has group = 'Custom'
+//   - Prints the Java version (System.getProperty('java.version'))
+//   - Prints the Gradle version (gradle.gradleVersion)
+//   - Prints the project name and version
+//
+// Remember: Use doLast {} to ensure code runs during execution, not configuration!
+
+// YOUR CODE HERE
+
+// ============================================================================
+// TODO 2: Task with Inputs/Outputs (Incremental Build)
+// ============================================================================
+// Create a task called 'generateBuildReport' that:
+//   - Has description = 'Generates a build report file'
+//   - Has group = 'Custom'
+//   - Takes project.name as an input property
+//   - Takes project.version as an input property
+//   - Outputs to file: "$buildDir/reports/build-report.txt"
+//   - In doLast, writes the project name, version, and timestamp to the output file
+//
+// After running once, run again and observe: it should say UP-TO-DATE
+// because inputs haven't changed!
+
+// YOUR CODE HERE
+
+// ============================================================================
+// TODO 3: Task with Dependencies
+// ============================================================================
+// Create a task called 'fullReport' that:
+//   - Depends on BOTH 'showBuildInfo' and 'generateBuildReport'
+//   - Has group = 'Custom'
+//   - In doLast, prints "Full report complete!"
+//
+// Running ./gradlew fullReport should execute all three tasks in order.
+
+// YOUR CODE HERE
+
+// ============================================================================
+// CHALLENGE: Add a 'clean' dependency
+// ============================================================================
+// Make 'generateBuildReport' run AFTER 'clean' if both are invoked:
+//   generateBuildReport.mustRunAfter clean
+//
+// Test with: ./gradlew clean generateBuildReport
+// Question: Does 'clean' cause 'generateBuildReport' to regenerate? Why?

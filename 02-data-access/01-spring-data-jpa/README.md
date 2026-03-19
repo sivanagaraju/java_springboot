@@ -1,16 +1,21 @@
-# Track 3: Spring Data JPA
+# 01 — Spring Data JPA
 
 ## Overview
-This module explores the exact standard mechanism for interacting with Relational Databases in the Spring Ecosystem. We move from raw JDBC, past manual Hibernate mappings, and directly into the architectural magic of Spring Data Repositories.
 
-## Core Concepts
-- **JDBC & ORM:** Understand the historical pain of raw SQL and how Object-Relational Mappers (ORMs) solve the mapping problem conceptually.
-- **JPA vs. Hibernate:** JPA is the rulebook (specification). Hibernate is the engine (implementation).
-- **Entities:** How to map a generic Java Object perfectly to a database table utilizing `@Entity`, `@Id`, and `@Column`.
-- **The Application Context Connection:** How Spring manages the `EntityManager` and Data Sources behind the scenes.
-- **Spring Data Repositories:** The abstraction layer on top of Hibernate. By defining empty interfaces extending `JpaRepository`, Spring builds the entire concrete DAOs for you dynamically.
-- **Derived Query Methods:** Writing English method signatures matching your class fields and allowing Spring to mathematically generate the SQL query automatically (e.g., `findByEmail`).
+This sub-module covers the foundational concepts of JPA (Jakarta Persistence API) and Spring Data JPA. You will learn how to define database entities, use repositories for CRUD operations, and write derived query methods — all compared to Python's SQLAlchemy.
+
+## Core Concepts Covered
+
+1. **What is JPA?** — JPA vs Hibernate vs JDBC; the specification-implementation pattern
+2. **Entities and Annotations** — `@Entity`, `@Id`, `@Column`, `@Table` and how they map to database tables
+3. **Spring Data Repositories** — `JpaRepository`, `CrudRepository`, and the repository hierarchy
+4. **Derived Query Methods** — Convention-based queries like `findByNameAndAge`
 
 ## Structure
-- `explanation/`: Deep dives into Entity mapping, Repository creation, and Query Method syntax organically.
-- `exercises/`: Challenges pushing you to write Entity standard annotations and mechanically flawless repository signatures.
+
+- `explanation/` — Deep-dive markdown files for each concept, with Mermaid diagrams and Python comparisons
+- `exercises/` — Hands-on tasks to build JPA entities and repositories
+
+## Mindmap
+
+See [MINDMAP.md](MINDMAP.md) for a visual overview of all Spring Data JPA concepts.

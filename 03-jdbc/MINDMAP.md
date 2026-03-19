@@ -1,0 +1,52 @@
+# JDBC Module Mindmap
+
+- JDBC (Java Database Connectivity)
+  - Architecture
+    - JDBC API (java.sql package)
+    - Driver Manager
+    - JDBC Drivers (Type 4 = pure Java)
+    - Connection URL format
+  - Connection Management
+    - DriverManager.getConnection()
+    - Connection interface
+    - try-with-resources (AutoCloseable)
+    - Connection properties
+    - Python: psycopg2.connect()
+  - Statement Types
+    - Statement (static SQL — SQL injection risk!)
+    - PreparedStatement (parameterized — safe!)
+    - CallableStatement (stored procedures)
+  - PreparedStatement Deep Dive
+    - Parameter binding (setString, setInt, setDate)
+    - Batch operations (addBatch, executeBatch)
+    - SQL injection prevention
+    - Python: cursor.execute(sql, params)
+  - ResultSet
+    - Cursor-based iteration
+    - Column access (by name vs by index)
+    - Type mapping (SQL → Java)
+    - Scrollable ResultSets
+    - Python: cursor.fetchall()
+  - Transactions
+    - ACID properties
+    - autoCommit (default: true in JDBC!)
+    - Manual commit/rollback
+    - Savepoints
+    - Isolation levels
+    - Python: conn.commit() / conn.rollback()
+  - Connection Pooling
+    - Why pooling (connection cost = ~50ms)
+    - Pool lifecycle (borrow → use → return)
+    - Pool sizing (connections = CPU cores × 2)
+    - Stale connection detection
+  - HikariCP
+    - Default Spring Boot pool
+    - Configuration properties
+    - Monitoring and metrics
+    - Leak detection
+    - Python: SQLAlchemy create_engine(pool_size=5)
+  - Mini-Project: Employee JDBC
+    - DAO pattern (Data Access Object)
+    - CRUD operations with PreparedStatement
+    - Transaction management
+    - DatabaseConfig class
