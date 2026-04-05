@@ -1,5 +1,22 @@
 # Lambda Expressions & Functional Interfaces
 
+## Diagram: Lambda to Bytecode Pipeline
+
+```mermaid
+flowchart TD
+    A["Lambda expression\n(a, b) -> a.length() - b.length()"] --> B["Compiler checks\ntarget functional interface"]
+    B --> C{"Single Abstract\nMethod (SAM)?"}
+    C -- No --> D["Compile error:\nnot a functional interface"]
+    C -- Yes --> E["javac emits invokedynamic\nbytecode instruction"]
+    E --> F["JVM bootstrap:\nLambdaMetafactory.metafactory()"]
+    F --> G["First call: JVM synthesizes\nhidden implementation class"]
+    G --> H["Subsequent calls:\nreuse existing class instance\n(if non-capturing)"]
+    H --> I["Lambda executes\nas method on heap object"]
+
+    J["@FunctionalInterface\nComparator&lt;T&gt;"] --> C
+    K["Predicate, Function,\nConsumer, Supplier,\nBiFunction..."] --> C
+```
+
 ## What Is a Lambda?
 
 A lambda is an anonymous function — a block of code you can pass around like a variable.

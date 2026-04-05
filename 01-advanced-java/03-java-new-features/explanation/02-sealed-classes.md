@@ -1,5 +1,25 @@
 # Sealed Classes — Controlled Inheritance (Java 17)
 
+## Diagram: Sealed Class Hierarchy and Exhaustiveness
+
+```mermaid
+flowchart TD
+    A["sealed interface Shape\npermits Circle, Rectangle, Triangle"] --> B["Circle\n(record or final class)"]
+    A --> C["Rectangle\n(record or final class)"]
+    A --> D["Triangle\n(record or final class)"]
+
+    E["switch (shape)"] --> F{"Compiler checks\nexhaustiveness"}
+    F -- "All permits covered" --> G["No default needed!\nCompiler guarantees\nno other subtype exists"]
+    F -- "Missing case" --> H["COMPILE ERROR\n'switch expression\ndoes not cover all cases'"]
+
+    B --> I["permitted subtype modifiers:\nfinal — no further extension\nsealed — extends chain further\nnon-sealed — open to anyone"]
+    C --> I
+    D --> I
+
+    style G fill:#51cf66
+    style H fill:#ff6b6b
+```
+
 ## The Problem Sealed Classes Solve
 
 ```
@@ -84,6 +104,20 @@ This gives you:
 ✅ Compiler error if you add a new variant and miss a switch case
 ✅ No instanceof chains or visitor pattern needed
 ```
+
+---
+
+## Python Bridge
+
+| Java Sealed Class | Python Equivalent |
+|---|---|
+| `sealed interface Shape permits Circle, Square` | `Union[Circle, Square]` type hint (no runtime enforcement) |
+| Exhaustive `switch` — compile error if missing | `match` with `case _: raise ValueError(...)` — runtime only |
+| `final class Circle implements Shape` | No `final` in Python — convention only |
+| Compiler proves exhaustiveness | `mypy` can check exhaustiveness with `assert_never()` |
+| ADT (Algebraic Data Type) pattern | Python `dataclasses` + `Union` type |
+
+**Critical Difference:** Java sealed classes provide *compile-time* exhaustiveness checking — if you add a new permitted subtype, every `switch` that doesn't cover it becomes a compile error. Python's type system (even with mypy) provides this at static analysis time only, not at runtime. For domain modeling (e.g., `Result = Success | Failure | Pending`), Java sealed interfaces give stronger guarantees. This is the core use case: replacing stringly-typed enums with rich polymorphic types.
 
 ---
 

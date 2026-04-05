@@ -1,5 +1,23 @@
 # Optional: Null-Safe Return Types
 
+## Diagram: Optional Method Decision Tree
+
+```mermaid
+flowchart TD
+    A["Optional&lt;T&gt; returned\nfrom method call"] --> B{"Need to\ntransform value?"}
+    B -- Yes --> C["map(fn)\nif present: apply fn\nif empty: stay empty"]
+    B -- No --> D{"Need to unwrap\nto another Optional?"}
+    D -- Yes --> E["flatMap(fn)\navoids Optional&lt;Optional&lt;T&gt;&gt;"]
+    D -- No --> F{"Need a\ndefault value?"}
+    F -- "Value" --> G["orElse(default)\nALWAYS evaluates default"]
+    F -- "Lazy value" --> H["orElseGet(supplier)\nevaluates only if empty"]
+    F -- "Throw exception" --> I["orElseThrow(exceptionSupplier)"]
+    F -- "Just check" --> J["isPresent() / isEmpty()\nifPresent(consumer)"]
+
+    G --> K["WARNING: orElse(expensiveCall())\nalways calls expensiveCall!\nUse orElseGet instead"]
+    style K fill:#ff6b6b
+```
+
 ## The Billion-Dollar Mistake
 
 Tony Hoare, who invented null references, called them his "billion-dollar mistake." NullPointerException is the #1 runtime exception in Java applications.

@@ -1,5 +1,26 @@
 # File I/O Basics — Byte Streams, Character Streams, and Resource Management
 
+## Diagram: Java I/O Stream Selection
+
+```mermaid
+flowchart TD
+    A["Reading/writing data?"] --> B{"Data type?"}
+    B --> C["Raw bytes\n(images, PDFs, zip, network)"]
+    B --> D["Text / characters\n(CSV, JSON, config files)"]
+
+    C --> E["InputStream / OutputStream\nFileInputStream, FileOutputStream"]
+    D --> F["Reader / Writer\nFileReader, FileWriter"]
+
+    E --> G{"Performance\ncritical?"}
+    F --> G
+
+    G -- Yes --> H["Wrap with Buffered*\nBufferedInputStream\nBufferedReader\n8192-byte buffer default"]
+    G -- No --> I["Use directly\nfor small files"]
+
+    H --> J["Always close in\ntry-with-resources!"]
+    I --> J
+```
+
 ## 1. The Two Stream Families
 
 ```
@@ -103,6 +124,22 @@ try (BufferedWriter bw = new BufferedWriter(new FileWriter("report.csv"))) {
     bw.newLine();
 }
 ```
+
+---
+
+## Python Bridge
+
+| Java I/O | Python Equivalent |
+|---|---|
+| `FileInputStream` / `FileOutputStream` | `open(path, 'rb')` / `open(path, 'wb')` |
+| `FileReader` / `FileWriter` | `open(path, 'r', encoding='utf-8')` |
+| `try-with-resources` | `with open(...) as f:` context manager |
+| `BufferedReader.readLine()` | `f.readline()` or `for line in f:` |
+| `InputStream.read(byte[])` | `f.read(n)` — reads n bytes |
+| `Files.readString(path)` | `Path(path).read_text()` (pathlib) |
+| `Files.writeString(path, content)` | `Path(path).write_text(content)` |
+
+**Critical Difference:** Python's `with open(...)` is the same concept as Java's `try-with-resources` — both guarantee the file is closed even on exception. The key Java gotcha is that you must explicitly wrap a `FileReader` with `BufferedReader` for line-by-line performance; Python's `open()` with text mode already uses buffering internally.
 
 ---
 

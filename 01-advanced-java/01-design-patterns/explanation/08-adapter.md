@@ -1,5 +1,22 @@
 # Adapter Pattern — Bridge Incompatible Interfaces
 
+## Diagram: Adapter Translation Flow
+
+```mermaid
+flowchart LR
+    A["Client code\nprocessor.charge(\n  amount=29.99,\n  currency='USD')"] --> B["PaymentProcessor\ninterface\n(Target)"]
+    B --> C["StripeAdapter\nimplements PaymentProcessor"]
+    C --> D["Translate:\namount × 100 → cents\n29.99 → 2999"]
+    D --> E["StripeApi.createCharge(\n  amountInCents=2999,\n  currency='USD')"]
+    E --> F["int statusCode\n200 = success"]
+    F --> G["Translate:\nint 200 → boolean true"]
+    G --> H["boolean returned\nto client"]
+
+    style C fill:#ffd43b
+    style D fill:#74c0fc
+    style G fill:#74c0fc
+```
+
 ## The Problem
 
 ```
@@ -105,6 +122,18 @@ Also:
 ```
 
 ---
+
+## Python Bridge
+
+| Java Adapter | Python Equivalent |
+|---|---|
+| `class StripeAdapter implements PaymentProcessor` | Wrapper class or function that translates the API |
+| Object Adapter (composition) | Python class wrapping the third-party object |
+| Class Adapter (inheritance) | Python class inheriting from both (multiple inheritance allowed) |
+| `HandlerAdapter` in Spring MVC | No direct equiv; Python web frameworks use duck typing |
+| Adapter for unit tests (mock) | `unittest.mock.patch` wraps the external API |
+
+**Critical Difference:** Python's duck typing often eliminates the need for a formal Adapter. If the third-party object happens to have the methods you need with compatible signatures, no adapter is needed. Java's static type system requires an explicit Adapter class that implements the target interface. However, when APIs genuinely differ (Stripe's cents vs your dollars), an adapter wrapper is equally necessary in both languages.
 
 ## 🎯 Interview Questions
 

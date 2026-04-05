@@ -1,5 +1,31 @@
 # Queue & Deque — FIFO, LIFO & Priority Ordering
 
+## Diagram: Queue / Deque Type Selection
+
+```mermaid
+flowchart TD
+    A["Need Queue/Stack behavior?"] --> B{"Ordering?"}
+    B --> C["FIFO\nFirst-In-First-Out"]
+    B --> D["LIFO\nLast-In-First-Out (Stack)"]
+    B --> E["Priority\nMin/Max heap order"]
+
+    C --> F{"Thread-safe?"}
+    F -- No --> G["ArrayDeque\nfastest FIFO, no null"]
+    F -- Yes --> H["LinkedBlockingQueue\nor ConcurrentLinkedQueue"]
+
+    D --> I["ArrayDeque.push()/pop()\nDO NOT use Stack class (legacy)"]
+
+    E --> J["PriorityQueue\nmin-heap by default\nnatural or Comparator order"]
+
+    G --> K["Preferred over LinkedList\nfor queue use cases"]
+    I --> K
+
+    style G fill:#51cf66
+    style I fill:#51cf66
+    style J fill:#74c0fc
+    style H fill:#74c0fc
+```
+
 ## Python → Java Mental Map
 
 | Python | Java |

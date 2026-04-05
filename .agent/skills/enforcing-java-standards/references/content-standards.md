@@ -152,6 +152,19 @@ Every mini-project `ARCHITECTURE.md` must contain:
 
 ---
 
+## Sub-topic Support Pack
+
+If the topic is a substantial deepening, also create/update these files in the
+specific sub-topic folder under `resources/`:
+
+- `progressive-quiz-drill.md`
+- `one-page-cheat-sheet.md`
+- `top-resource-guide.md`
+
+`top-resource-guide.md` must be a curated list of external learning resources
+only: books, official docs, blogs, and videos. Do not use internal repo links
+as the primary content of that file.
+
 ## What Immediately Fails the Standard
 
 | Failure | Standard Violated |

@@ -1,5 +1,23 @@
 # Pattern Matching — Smart Casting (Java 16+)
 
+## Diagram: Pattern Matching Switch Dispatch
+
+```mermaid
+flowchart TD
+    A["switch (shape)"] --> B{"Runtime type?"}
+    B --> C["case Circle c\nwhen c.radius() > 10"]
+    B --> D["case Circle c\n(radius ≤ 10)"]
+    B --> E["case Rectangle r"]
+    B --> F["case null\n(explicit null handling)"]
+
+    C --> G["Large circle logic\nusing c directly\n(no cast needed)"]
+    D --> H["Small circle logic"]
+    E --> I["Rectangle logic\nusing r.width(), r.height()"]
+    F --> J["throw or handle null\nwithout NPE"]
+
+    K["Sealed interface Shape\npermits Circle, Rectangle\n→ no default needed\ncompiler checks exhaustiveness"] --> A
+```
+
 ## 1. instanceof Pattern Matching
 
 ```
@@ -97,6 +115,20 @@ Record Pattern Destructuring:
 │    case Line(Point(x1, y1), Point(x2, y2)): ... │
 └──────────────────────────────────────────────────┘
 ```
+
+---
+
+## Python Bridge
+
+| Java Pattern Matching | Python Equivalent |
+|---|---|
+| `if (obj instanceof String s)` | `if isinstance(obj, str): s = obj` — manual assignment |
+| `switch (shape) { case Circle c -> ... }` | `match shape: case Circle(): ...` (Python 3.10+) |
+| `case Circle c when c.radius() > 10` | `case Circle(radius=r) if r > 10:` |
+| Exhaustive switch on sealed types | `match` — not compile-checked, runtime only |
+| `case null` explicit in switch | `case None:` in Python match |
+
+**Critical Difference:** Python's `match` statement (3.10+) and Java's pattern matching switch were introduced around the same time (2021-2022) with similar goals. Key difference: Python's `match` uses structural pattern matching — `case Point(x=0, y=y)` deconstructs by attribute name. Java's patterns match by type first and bind a variable — more explicit, less magic. Python's structural patterns are more powerful for deeply nested data; Java's type patterns integrate better with the class hierarchy.
 
 ---
 

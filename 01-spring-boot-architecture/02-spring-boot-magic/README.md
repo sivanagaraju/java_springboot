@@ -1,23 +1,42 @@
-# 02 - Spring Boot Magic (Starters & Auto-Configuration)
+# 02 - Spring Boot Magic
 
-Welcome to the second module. Now that you understand how the underlying Spring Framework IoC Container works, it's time to learn how **Spring Boot** automates it.
+This module explains how Spring Boot automates the container you learned in the IoC module. The key idea is simple: Boot does not guess randomly. It evaluates classpath, properties, profiles, and conditions to decide which beans should exist.
 
-> **Python Bridge:** Spring Boot is to the Spring Framework what Django is to raw Python web libraries: an extremely opinionated framework designed to get an enterprise app running in 5 seconds flat with zero configuration mapping. 
+> Python bridge: if FastAPI or Django settings decide which dependencies or middleware are wired, Spring Boot is doing the same thing at container startup, but in a more declarative and opinionated way.
 
-## 🎯 Why This Module Matters
-Vanilla Spring forces you to manually configure hundreds of lines of XML or Java `@Configuration` beans to wire Database connection pools, JSON parsers, and embedded Tomcat Web Servers. This was notoriously known as "XML Hell." 
+## Why This Module Matters
+Vanilla Spring required a lot of manual configuration for infrastructure beans such as web servers, JSON mappers, and data sources. Spring Boot removes that overhead with starters and auto-configuration.
 
-Spring Boot eliminates this boilerplate using two core architectural mechanisms: **Starters** and **Auto-Configuration**. By mastering these, you will understand how Boot "magically" sets up your application safely and correctly.
+## Startup Decision Flow
 
-## 📚 What You Will Learn
-1. **Spring Boot Goals:** Why it exists (Convention over Configuration).
-2. **Auto-Configuration:** How Spring Boot uses `@Conditional` logic to dynamically guess what infrastructure dependencies to instantiate based on your classpath.
-3. **Starters:** How Maven/Gradle "starter" dependencies solve library version conflicts ("Dependency Hell") permanently.
-4. **Application Properties:** How to inject custom variables using `@Value` and override Boot's embedded defaults using `application.properties`.
+```mermaid
+flowchart TD
+    A[Boot startup] --> B[Check classpath]
+    B --> C[Load properties and profiles]
+    C --> D[Evaluate conditions]
+    D --> E[Create default bean]
+    D --> F[Back off if user bean exists]
+```
 
-## 📂 Directory Structure
-- `/explanation`: Start here. Contains conceptual breakdowns, Mermaid charts, and Interview QA. Read 01 through 04.
-- `/exercises`: Hands-on coding exercises. Test your knowledge by overriding Auto-Configuration and wiring custom properties cleanly.
+## What You Will Learn
+1. Spring Boot goals and the idea of convention over configuration.
+2. Auto-configuration and the `@Conditional` family.
+3. Starters and dependency alignment through the Boot BOM.
+4. Application properties, profile overlays, and environment-specific behavior.
+5. Conditional beans that let Boot back off when you provide your own implementation.
 
-## 🚀 How to Proceed
-Start by deeply reading the `/explanation` files sequentially. Review the Java Demo files. Finally, complete the tasks inside `/exercises/README.md`.
+## Directory Structure
+- `/explanation`: Conceptual breakdowns, Mermaid diagrams, Python comparisons, and interview questions
+- `/exercises`: Hands-on practice for properties and custom condition logic
+- `/resources`: Progressive quiz drill, one-page cheat sheet, and external learning resources
+
+## Support Pack
+
+- [Progressive Quiz Drill](resources/progressive-quiz-drill.md)
+- [One-Page Cheat Sheet](resources/one-page-cheat-sheet.md)
+- [Top Resource Guide](resources/top-resource-guide.md)
+
+## How to Proceed
+1. Read the explanation files in order.
+2. Run `AutoConfigurationDemo.java` and `ConditionalDemo.java` to see the startup decision tree.
+3. Complete the exercises once you can explain why Boot chose each bean.

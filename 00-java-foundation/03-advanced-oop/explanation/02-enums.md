@@ -3,6 +3,21 @@
 At a junior level, an Enum is just a list of constant variables (e.g., `RED, GREEN, BLUE`).
 To an Architect, an Enum in Java is the absolute most secure, thread-safe, computationally optimized Singleton instantiation architecture mechanically possible in the entire Java language ecosystem.
 
+## Diagram: Enum as Thread-Safe Singleton Architecture
+
+```mermaid
+flowchart TD
+    A["enum Status { ACTIVE, INACTIVE }"] --> B["javac compiles to\nfinal class extending Enum"]
+    B --> C["public static final Status ACTIVE\n= new Status('ACTIVE', 0)"]
+    B --> D["public static final Status INACTIVE\n= new Status('INACTIVE', 1)"]
+    C --> E["JVM Class Loading\n(static initializer)"]
+    D --> E
+    E --> F["Both instances created ONCE\nat class load time"]
+    F --> G["Thread-safe by JVM guarantee\n(class loading is synchronized)"]
+    F --> H["Cannot be cloned or\nde-serialized as new instances"]
+    G --> I["Most secure Singleton\npattern in Java"]
+```
+
 ## How the Compiler Fakes Enums
 
 Unlike C++, where an Enum is fundamentally just an integer integer under the hood mapped to a name, the Java Virtual Machine natively structurally possesses absolutely zero concept of an Enum.

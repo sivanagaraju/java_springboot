@@ -1,5 +1,31 @@
 # Concurrent Collections — Thread-Safe Data Structures
 
+## Diagram: Concurrent Collection Selection
+
+```mermaid
+flowchart TD
+    A["Need thread-safe collection?"] --> B{"Collection type?"}
+    B --> C["Map"]
+    B --> D["List"]
+    B --> E["Queue / Deque"]
+
+    C --> F{"Read-heavy or\nwrite-heavy?"}
+    F -- "Mixed reads/writes\nhigh concurrency" --> G["ConcurrentHashMap\nSegment-level locking\nO(1) lock-free reads"]
+    F -- "Sorted map needed" --> H["ConcurrentSkipListMap\nsorted + thread-safe\nO(log n)"]
+
+    D --> I{"Iteration pattern?"}
+    I -- "Iterate frequently\nrare writes" --> J["CopyOnWriteArrayList\nsnapshot on every write\nO(n) write cost"]
+    I -- "Frequent writes" --> K["Collections.synchronizedList()\nor use ConcurrentLinkedQueue"]
+
+    E --> L{"Blocking needed?"}
+    L -- "Producer-Consumer\nblock on empty/full" --> M["LinkedBlockingQueue\nArrayBlockingQueue"]
+    L -- "Non-blocking" --> N["ConcurrentLinkedQueue\nConcurrentLinkedDeque"]
+
+    style G fill:#51cf66
+    style J fill:#74c0fc
+    style M fill:#51cf66
+```
+
 ## Python → Java Mental Map
 
 | Python | Java |

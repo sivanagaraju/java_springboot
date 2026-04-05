@@ -1,5 +1,24 @@
 # Virtual Threads — Lightweight Concurrency (Java 21)
 
+## Diagram: Virtual Thread Architecture
+
+```mermaid
+flowchart TD
+    A["10,000 concurrent\nweb requests"] --> B{"Thread model?"}
+    B --> C["Platform Threads\n(Traditional)"]
+    B --> D["Virtual Threads\n(Java 21)"]
+
+    C --> E["Thread pool: ~200 threads\n9,800 requests WAIT\n1 platform thread = 1 OS thread\n~1MB stack each"]
+    E --> F["Thread blocked on DB query?\nOS thread BLOCKED too\nCPU sits idle\n→ Throughput limited by pool size"]
+
+    D --> G["1 virtual thread per request\n10,000 virtual threads = fine\nVirtual thread blocked on I/O?"]
+    G --> H["JVM unmounts virtual thread\nfrom carrier (OS) thread\nCarrier thread picks up\nanother virtual thread\nI/O completes → remounted"]
+    H --> I["CPU never idles\nHigh throughput\nSimple blocking code style"]
+
+    style F fill:#ff6b6b
+    style I fill:#51cf66
+```
+
 ## The Problem Virtual Threads Solve
 
 ```
@@ -109,6 +128,21 @@ What this does:
 │ For most apps: MVC + Virtual Threads is the right choice│
 └────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Python Bridge
+
+| Java Virtual Threads | Python Equivalent |
+|---|---|
+| `Thread.ofVirtual().start(runnable)` | `asyncio.create_task(coroutine)` |
+| Virtual thread blocks on I/O → unmounts | `await` suspends coroutine — same concept |
+| Millions of virtual threads | Millions of asyncio tasks |
+| Blocking code style (no async/await) | `asyncio` requires `async def` and `await` everywhere |
+| `Executors.newVirtualThreadPerTaskExecutor()` | `asyncio.TaskGroup` |
+| Spring Boot 3.2 + virtual threads: set `spring.threads.virtual.enabled=true` | FastAPI is async-native |
+
+**Critical Difference:** This is the deepest architectural difference between the platforms. Python's `asyncio` requires *explicit* cooperative multitasking — every I/O call must be `await`-ed, spreading `async def` through your entire codebase. Java virtual threads achieve the *same throughput* while letting you write normal **blocking** code — the JVM handles the scheduling transparently. Virtual threads are Java's answer to Python async, without the async "virus" that infects every function in the call stack.
 
 ---
 

@@ -1,22 +1,34 @@
-# 01 - Inversion of Control (IoC) & Dependency Injection (DI)
+# 01 - Inversion of Control (IoC) and Dependency Injection (DI)
 
-Welcome to the foundation of the Spring Framework. Before you can write a functional Spring Boot application, you must master the core architectural pattern that Spring is built upon: **Inversion of Control**.
+This is the foundation of the Spring Framework. If we do not understand how Spring takes over object creation, wiring, and lifecycle management, the rest of Spring Boot will look like unexplained magic.
 
-> **Python Bridge:** In Python, global variables, singletons, or explicit structural wiring (`my_service = Service(db_conn)`) dictate how objects find each other. Spring automates this completely by taking control over object creation and injecting the required pieces at runtime, much like an advanced, automated factory.
+> Python bridge: in Python, you often wire dependencies explicitly with constructors or factory functions. Spring does the same work, but the container owns the object graph and injects dependencies at startup.
 
-## 🎯 Why This Module Matters
-Traditional Java applications tightly couple their classes together using the `new` keyword. This makes unit testing impossible and adapting to business changes incredibly painful. Spring's **IoC Container** solves this by physically separating the creation of objects from their usage.
+## Why This Module Matters
+Traditional Java code tends to couple classes together with `new`. That makes testing harder, swapping implementations harder, and production debugging much more fragile. Spring's IoC container solves that by moving object creation out of the application code.
 
-## 📚 What You Will Learn
-1. **Tight Coupling:** Why the `new` keyword is dangerous in enterprise architecture.
-2. **IoC Container:** How the `ApplicationContext` manages the lifecycle of your objects.
-3. **Dependency Injection:** Why Constructor Injection is the only acceptable method for wiring dependencies.
-4. **Bean Scopes:** The difference between Singletons and Prototypes, and why Singletons must remain stateless.
-5. **Component Scanning:** How Spring uses stereotypes (`@Component`, `@Service`, `@Repository`) to automatically discover your code.
+## Container Mental Model
 
-## 📂 Directory Structure
-- `/explanation`: Start here. Contains detailed theory, Mermaid diagrams, Python comparisons, and Interview Q&A.
-- `/exercises`: Hands-on coding exercises. Read the instructions in the `README.md` inside, modify the `.java` files, and run them to prove you understand the concepts.
+```mermaid
+flowchart LR
+    A[Controller] --> B[Service interface]
+    B --> C[ApplicationContext]
+    C --> D[Concrete service bean]
+    D --> E[Repository bean]
+```
 
-## 🚀 How to Proceed
-Start by deeply reading the files in the `explanation` folder in numbered order (01 → 05). Then, run the `.java` demos inside that folder to view the console output. Finally, tackle the `exercises`.
+## What You Will Learn
+- Tight coupling versus IoC
+- `ApplicationContext` as the bean registry and lifecycle manager
+- Constructor injection as the preferred enterprise style
+- Bean scopes and lifecycle callbacks
+- Component scanning and stereotype annotations
+
+## Directory Structure
+- `/explanation`: Deep theory, Mermaid diagrams, Python comparisons, and interview questions
+- `/exercises`: Hands-on coding tasks to prove the concepts
+
+## How to Proceed
+1. Read the explanation files in order.
+2. Run the Java demos in `explanation/` to see the container model in action.
+3. Finish the exercises once the IoC story is clear.

@@ -1,59 +1,56 @@
 # JDBC Fundamentals Mindmap
 
 - JDBC Fundamentals
+  - Why raw JDBC before JPA
+    - JPA sits on top of JDBC
+    - PreparedStatement teaches safe parameter binding
+    - Transactions teach atomic units of work
   - Architecture
     - java.sql package (API layer)
     - javax.sql package (extensions)
-    - JDBC Driver types (1-4)
-      - Type 4: Pure Java (modern standard)
-    - Driver loading (automatic via ServiceLoader)
-    - Connection URL format: jdbc:postgresql://host:port/db
+    - JDBC driver types
+    - ServiceLoader driver loading
+    - Connection URL format
+    - Python: psycopg2.connect(dsn)
   - Connection Management
     - DriverManager.getConnection(url, user, pass)
     - Connection interface methods
-    - AutoCloseable (try-with-resources)
-    - Connection properties (timeout, schema)
-    - Python: psycopg2.connect(dsn)
+    - AutoCloseable and try-with-resources
+    - Connection properties
   - Statement Types
-    - Statement (static SQL)
-      - SQL injection vulnerable!
-      - Only for DDL or trusted SQL
-    - PreparedStatement (parameterized)
-      - Compiled once, executed many times
-      - Type-safe parameter binding
-      - SQL injection safe
+    - Statement (static SQL and injection risk)
+    - PreparedStatement (parameterized and safe)
     - CallableStatement (stored procedures)
-      - IN / OUT / INOUT parameters
   - PreparedStatement Deep Dive
-    - setString(1, value) — 1-indexed!
-    - Batch operations
-      - addBatch() + executeBatch()
-      - 100x faster for bulk inserts
-    - Python: cursor.execute(sql, (param1, param2))
+    - setString(1, value) is 1-indexed
+    - Batch operations with addBatch() and executeBatch()
+    - SQL injection prevention
+    - Python: cursor.execute(sql, params)
   - ResultSet
-    - next() — cursor-based iteration
-    - getString("column_name") vs getString(1)
-    - Type mapping: VARCHAR→String, INTEGER→int
+    - next() for cursor iteration
+    - getString(name) vs getString(index)
+    - Type mapping from SQL to Java
     - wasNull() for nullable columns
-    - Python: cursor.fetchone() / fetchall()
   - Transactions
-    - ACID: Atomicity, Consistency, Isolation, Durability
+    - ACID properties
     - conn.setAutoCommit(false)
     - conn.commit() / conn.rollback()
-    - Savepoints: conn.setSavepoint("name")
+    - Savepoints
     - Isolation levels
-      - READ_UNCOMMITTED (dirty reads)
-      - READ_COMMITTED (default PostgreSQL)
-      - REPEATABLE_READ
-      - SERIALIZABLE (strictest)
   - Connection Pooling
-    - Problem: new connection = TCP + auth (~50ms)
-    - Solution: reuse connections from pool
-    - Pool lifecycle: create → borrow → use → return → destroy
-    - Sizing: connections ≈ CPU cores × 2
+    - Reusing connections instead of creating new TCP sessions
+    - Pool lifecycle: create, borrow, use, return, destroy
+    - Sizing heuristics
   - HikariCP
-    - Default in Spring Boot
-    - maximumPoolSize (default 10)
-    - connectionTimeout (default 30s)
-    - idleTimeout (default 10min)
-    - Leak detection (leakDetectionThreshold)
+    - Default Spring Boot pool
+    - maximumPoolSize, connectionTimeout, idleTimeout
+    - Leak detection
+  - CRUDWithJDBC.java
+    - Complete CRUD walkthrough
+    - SQL templates and batch write notes
+    - Python equivalent for each operation
+  - Mini-Project: Employee JDBC
+    - DAO pattern
+    - CRUD operations with PreparedStatement
+    - Transaction management
+    - DatabaseConfig class

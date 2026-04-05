@@ -1,50 +1,39 @@
-# Mindmap: Inversion of Control & Dependency Injection
+# Inversion of Control and Dependency Injection Mindmap
 
-```mermaid
-mindmap
-  root((Spring IoC
-  Foundation))
-    Problem
-      Tight Coupling
-      Hardcoded 'new' keyword
-      Impossible to Unit Test
-      Violates Open-Closed Principle
-    Core Solution
-      Inversion of Control (IoC)
-      Externalize Object Creation
-      Rely on Abstractions
-    The Container
-      ApplicationContext
-      BeanDefinition Registry
-      Startup Sequence
-    Dependency Injection
-      Field Injection (Anti-Pattern)
-      Setter Injection (Optional Deps)
-      Constructor Injection (Best Practice)
-        Forces Requirements
-        Guarantees Immutability (final)
-        Trivial to Test
-    Component Scanning
-      @SpringBootApplication
-      @Component
-      @Service (Business Logic)
-      @Repository (DB Access)
-      @Controller (Web Endpoints)
-      @Configuration & @Bean (3rd Party)
-    Bean Scopes
-      Singleton (Default)
-        Must be Stateless
-        One instance per Heap
-      Prototype
-        New instance every time
-        Not tracked by Spring
-      Web Scopes
-        @RequestScope
-        @SessionScope
-    Lifecycle
-      Instantiation
-      Dependency Injection
-      @PostConstruct
-      Ready / Use
-      @PreDestroy
-```
+- Inversion of Control (IoC)
+  - Problem
+    - Tight coupling from `new`
+    - Hard to unit test
+    - Hard to swap implementations
+  - Solution
+    - Move object creation into Spring
+    - Depend on interfaces and abstractions
+  - Application Context
+    - Bean registry
+    - Lifecycle manager
+    - Singleton container by default
+- Dependency Injection
+  - Constructor injection
+    - Preferred enterprise style
+    - Immutability with `final`
+    - Easy to test
+  - Setter injection
+    - Optional dependencies
+    - Mutable and easier to misuse
+  - Field injection
+    - Anti-pattern
+    - Hidden dependencies
+- Bean Lifecycle and Scopes
+  - Instantiation
+  - Dependency wiring
+  - `@PostConstruct`
+  - Singleton scope
+  - Prototype scope
+  - Request and session scope
+- Component Scanning
+  - `@SpringBootApplication`
+  - `@Component`
+  - `@Service`
+  - `@Repository`
+  - `@Controller`
+  - `@Configuration` and `@Bean`

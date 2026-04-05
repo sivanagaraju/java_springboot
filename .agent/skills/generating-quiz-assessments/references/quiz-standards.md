@@ -19,6 +19,7 @@ All quizzes, self-assessments, and interview prep documents follow these standar
 | Output type | File location | Naming convention |
 |------------|--------------|------------------|
 | Module quiz | `XX-module/resources/quiz.md` or `exercises/quiz.md` | `quiz.md` |
+| Progressive quiz drill | `XX-module/YY-subtopic/resources/progressive-quiz-drill.md` | `progressive-quiz-drill.md` |
 | Interview prep | `resources/interview-prep/<topic>.md` | `spring-security.md`, `jpa-hibernate.md` |
 | Phase assessment | `resources/assessments/phase-N-check.md` | `phase-2-check.md` |
 
@@ -111,6 +112,30 @@ Short factual questions. One-line answers. Used for "reflexes" testing.
 **Q18.** What Spring Boot property disables Hibernate schema DDL auto-generation?
 **Q19.** What does `spring.jpa.open-in-view=false` do?
 ```
+
+---
+
+## Progressive Quiz Drill Format
+
+Use this format when a sub-topic needs a staged self-check before or alongside the
+main quiz. It is shorter than a full module quiz, but it must still feel progressive.
+
+Recommended structure:
+- Round 1 â€” Core recall: 4â€“5 questions
+- Round 2 â€” Apply and compare: 3â€“4 questions
+- Round 3 â€” Debug and failure modes: 3â€“4 questions
+- Round 4 â€” Staff-level scenario: 2â€“3 questions
+
+Rules:
+- Total length is usually 10â€“15 questions
+- Answers must stay in a single Answer Key at the end
+- Difficulty must increase from round to round
+- Use real module concepts and avoid trivia
+- If the sub-topic is being deeply expanded, generate this file plus the one-page
+  cheat sheet and top resource guide in the same sub-topic `resources/` folder
+- `top-resource-guide.md` must be a curated external learning list only: books,
+  official docs, blogs, and videos. Do not use internal repo links as the primary
+  content of that file.
 
 ---
 

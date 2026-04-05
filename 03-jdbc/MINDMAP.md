@@ -1,6 +1,10 @@
 # JDBC Module Mindmap
 
 - JDBC (Java Database Connectivity)
+  - Why raw JDBC before JPA
+    - JPA is built on JDBC
+    - SQL stays visible
+    - Transaction boundaries stay explicit
   - Architecture
     - JDBC API (java.sql package)
     - Driver Manager
@@ -13,8 +17,8 @@
     - Connection properties
     - Python: psycopg2.connect()
   - Statement Types
-    - Statement (static SQL — SQL injection risk!)
-    - PreparedStatement (parameterized — safe!)
+    - Statement (static SQL)
+    - PreparedStatement (parameterized and safe)
     - CallableStatement (stored procedures)
   - PreparedStatement Deep Dive
     - Parameter binding (setString, setInt, setDate)
@@ -23,30 +27,34 @@
     - Python: cursor.execute(sql, params)
   - ResultSet
     - Cursor-based iteration
-    - Column access (by name vs by index)
-    - Type mapping (SQL → Java)
-    - Scrollable ResultSets
-    - Python: cursor.fetchall()
+    - Column access by name or index
+    - Type mapping from SQL to Java
+    - Python: cursor.fetchone() / fetchall()
   - Transactions
     - ACID properties
-    - autoCommit (default: true in JDBC!)
-    - Manual commit/rollback
+    - autoCommit default true in JDBC
+    - Manual commit and rollback
     - Savepoints
     - Isolation levels
     - Python: conn.commit() / conn.rollback()
   - Connection Pooling
-    - Why pooling (connection cost = ~50ms)
-    - Pool lifecycle (borrow → use → return)
-    - Pool sizing (connections = CPU cores × 2)
-    - Stale connection detection
+    - Why pooling exists
+    - Pool lifecycle: borrow, use, return
+    - Pool sizing heuristics
   - HikariCP
     - Default Spring Boot pool
     - Configuration properties
     - Monitoring and metrics
     - Leak detection
     - Python: SQLAlchemy create_engine(pool_size=5)
+  - CRUDWithJDBC demo
+    - CREATE
+    - READ
+    - UPDATE
+    - DELETE
+    - BATCH INSERT
   - Mini-Project: Employee JDBC
-    - DAO pattern (Data Access Object)
+    - DAO pattern
     - CRUD operations with PreparedStatement
     - Transaction management
     - DatabaseConfig class

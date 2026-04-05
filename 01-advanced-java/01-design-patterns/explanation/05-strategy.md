@@ -1,5 +1,22 @@
 # Strategy Pattern — Swappable Algorithms
 
+## Diagram: Strategy Swap at Runtime
+
+```mermaid
+flowchart TD
+    A["ShippingCalculator\n(Context)"] --> B["strategy.calculate(weight)"]
+    B --> C{"Which strategy\ninjected?"}
+    C --> D["StandardShipping\nweight × 2.5"]
+    C --> E["ExpressShipping\nweight × 5.0"]
+    C --> F["OvernightShipping\nweight × 7.5"]
+    C --> G["Lambda\nweight -> weight * 4.0\n✅ No class needed"]
+    D --> H["Result: $25 for 10kg"]
+    E --> I["Result: $50 for 10kg"]
+    F --> J["Result: $75 for 10kg"]
+    G --> K["Result: $40 for 10kg"]
+    L["calculator.setStrategy(new Express())\nSwap algorithm AT RUNTIME\nno recompile needed"] --> C
+```
+
 ## The Problem
 
 ```
@@ -118,6 +135,18 @@ Existing code unchanged!
 ```
 
 ---
+
+## Python Bridge
+
+| Java Strategy | Python Equivalent |
+|---|---|
+| `@FunctionalInterface ShippingStrategy` | Any callable (function, lambda, class with `__call__`) |
+| `calculator.setStrategy(new Express())` | `calculator.strategy = express_fn` |
+| `strategy.calculate(weight)` | `strategy(weight)` — Python callables are first-class |
+| Lambda strategy: `weight -> weight * 5` | `lambda weight: weight * 5` — identical concept |
+| `Comparator` (built-in strategy) | `key=lambda x: x.price` in `sorted()` |
+
+**Critical Difference:** Python functions are first-class objects — Strategy is the natural Python style. You don't need a `@FunctionalInterface` annotation or an interface at all; any callable works. In Java, the `@FunctionalInterface` annotation plus lambda support (Java 8+) closes this gap, letting you write strategies as lambdas rather than full classes.
 
 ## 🎯 Interview Questions
 

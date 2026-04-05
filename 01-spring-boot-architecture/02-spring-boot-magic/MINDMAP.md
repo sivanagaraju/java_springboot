@@ -1,33 +1,36 @@
-# Mindmap: Spring Boot Magic
+# Spring Boot Magic Mindmap
 
-```mermaid
-mindmap
-  root((Spring Boot Magic))
-    The Problem
-      XML Hell
-      Dependency version conflicts
-      Boilerplate server setup
-    The Philosophy
-      Convention over Configuration
-      Opinionated defaults
-      Zero XML
-    Mechanism 1: Starters
-      Pre-packaged dependency trees
-      spring-boot-starter-web
-      spring-boot-starter-data-jpa
-      No Version Clashes (BOM)
-    Mechanism 2: Auto-Configuration
-      Thousands of @Configuration classes
-      classpath scanning
-      @EnableAutoConfiguration
-    The @Conditional Engine
-      @ConditionalOnClass
-      @ConditionalOnMissingBean
-      @ConditionalOnProperty
-    Application Properties
-      application.properties / yml
-      Overriding Boot defaults (e.g. server.port)
-      Custom Business Keys
-      @Value Injection
-      Profile-specific (dev, prod)
-```
+- Spring Boot Magic
+  - Why it exists
+    - Remove XML hell
+    - Reduce startup boilerplate
+    - Provide opinionated defaults
+  - Startup flow
+    - Classpath inspection
+    - Property loading
+    - Profile overlay
+    - Auto-configuration evaluation
+    - Conditional bean registration
+  - Starters
+    - Curated dependency bundles
+    - Version alignment through the BOM
+    - `spring-boot-starter-web`
+    - `spring-boot-starter-data-jpa`
+  - Auto-Configuration
+    - `@EnableAutoConfiguration`
+    - `@ConditionalOnClass`
+    - `@ConditionalOnMissingBean`
+    - `@ConditionalOnProperty`
+  - Configuration
+    - `application.properties`
+    - `application-dev.properties`
+    - `application-prod.properties`
+    - `@Value`
+    - `@ConfigurationProperties`
+  - Demos
+    - `AutoConfigurationDemo.java`
+    - `ConditionalDemo.java`
+  - Study path
+    - Read explanation files in order
+    - Run the demos
+    - Use profiles to reason about environment-specific beans

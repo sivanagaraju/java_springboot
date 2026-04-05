@@ -26,6 +26,23 @@ PROCESS vs THREAD:
     - Sharing = DANGER (race conditions)
 ```
 
+## Diagram: Thread Lifecycle State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> NEW: new Thread()
+    NEW --> RUNNABLE: start()
+    RUNNABLE --> RUNNING: CPU scheduler picks thread
+    RUNNING --> RUNNABLE: yield() / time slice expired
+    RUNNING --> BLOCKED: waiting for synchronized lock
+    RUNNING --> WAITING: wait() / join() (no timeout)
+    RUNNING --> TIMED_WAITING: sleep() / wait(ms) / join(ms)
+    BLOCKED --> RUNNABLE: lock released
+    WAITING --> RUNNABLE: notify() / notifyAll() / join completes
+    TIMED_WAITING --> RUNNABLE: timeout expires / notify()
+    RUNNING --> TERMINATED: run() returns
+```
+
 ## Thread Lifecycle
 
 ```
@@ -141,6 +158,24 @@ daemon.start();
 // JVM exits when all USER threads finish.  
 // Daemon threads are killed automatically.
 ```
+
+---
+
+## Python Bridge
+
+| Java Threading | Python Equivalent |
+|---|---|
+| `new Thread(runnable)` | `threading.Thread(target=fn)` |
+| `thread.start()` | `thread.start()` |
+| `thread.join()` | `thread.join()` |
+| `Thread.sleep(ms)` | `time.sleep(seconds)` |
+| `thread.interrupt()` | No direct equiv — use `threading.Event.set()` |
+| `thread.setDaemon(true)` | `thread.daemon = True` |
+| `Runnable` interface | Any callable (function or `__call__`) |
+| `Thread.currentThread().getName()` | `threading.current_thread().name` |
+| `ExecutorService` (next topic) | `concurrent.futures.ThreadPoolExecutor` |
+
+**Critical Difference:** Python has the **Global Interpreter Lock (GIL)** — only one Python thread runs bytecode at a time (in CPython). Java threads are **true OS threads** running in parallel on multiple CPU cores. For CPU-bound parallelism in Python, use `multiprocessing`. Java threads are better for both CPU-bound and I/O-bound work.
 
 ---
 

@@ -72,6 +72,22 @@ Questions must be scenario-based, not definitional. "What is @Transactional?" is
 
 ---
 
+## Sub-topic Support Pack
+
+When a module is substantially deepened, create a support pack in the specific
+sub-topic folder that was expanded, for example `03-advanced-oop/resources/`:
+
+- `resources/progressive-quiz-drill.md`
+- `resources/one-page-cheat-sheet.md`
+- `resources/top-resource-guide.md`
+
+Use the support pack for larger explanation sets, phase work, or any deep
+sub-topic that adds enough depth to need revision, recall, and study aids. Keep
+each file concise and aligned to the sub-topic topic. `top-resource-guide.md`
+must be a curated list of external learning resources only: books, official docs,
+blogs, and videos. Do not use internal repo links as the primary content of that
+file.
+
 ## Java Commenting Standard (mandatory for every .java file)
 
 Every `.java` file uses exactly 4 comment layers. ASCII diagrams are MANDATORY in

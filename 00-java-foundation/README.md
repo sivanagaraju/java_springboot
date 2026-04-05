@@ -50,6 +50,12 @@ threading.Thread(target=fn)     new Thread(runnable).start()
 └──────────────────────────────────────────────────────────────────┘
 ```
 
+## Support Pack
+
+- [Progressive Quiz Drill](resources/progressive-quiz-drill.md)
+- [One-Page Cheat Sheet](resources/one-page-cheat-sheet.md)
+- [Top Resource Guide](resources/top-resource-guide.md)
+
 ## How to Run
 
 ```bash

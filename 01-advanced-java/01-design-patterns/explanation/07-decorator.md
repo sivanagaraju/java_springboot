@@ -1,5 +1,27 @@
 # Decorator Pattern — Wrapping Layers of Behavior
 
+## Diagram: Decorator Onion Layers
+
+```mermaid
+flowchart LR
+    A["client.getUser(id)"] --> B["LoggingDecorator\nlog(before)"]
+    B --> C["CachingDecorator\ncheck cache"]
+    C --> D{"Cache hit?"}
+    D -- Yes --> E["Return cached\n(skip DB)"]
+    D -- No --> F["ValidationDecorator\nvalidate(id)"]
+    F --> G["BasicUserService\ndb.find(id)"]
+    G --> H["Result bubbles back\nthrough each layer"]
+    H --> I["CachingDecorator\ncache.put(result)"]
+    I --> J["LoggingDecorator\nlog(after)"]
+    J --> K["Response to caller"]
+    E --> K
+
+    style B fill:#e8f4f8
+    style C fill:#d4edda
+    style F fill:#fff3cd
+    style G fill:#f8d7da
+```
+
 ## The Problem
 
 ```
@@ -110,6 +132,18 @@ Each interceptor wraps the next, adding cross-cutting behavior.
 ```
 
 ---
+
+## Python Bridge
+
+| Java Decorator | Python Equivalent |
+|---|---|
+| `class LoggingDecorator implements UserService` | `@functools.wraps` / `@app.middleware` in FastAPI |
+| Wrap via constructor: `new Logging(new Caching(base))` | `wrapped = logging_decorator(caching_decorator(base_fn))` |
+| Java I/O: `new BufferedInputStream(new FileInputStream(...))` | `io.BufferedReader(open(...))` — identical concept! |
+| Spring `HandlerInterceptor` chain | FastAPI `middleware` stack |
+| Spring AOP `@Around` advice | Python `@decorator` syntax |
+
+**Critical Difference:** Python's `@decorator` syntax IS the Decorator pattern — it's a first-class language feature. `@app.middleware("http")` in FastAPI is exactly a decorator wrapping every request. Java lacks syntactic sugar; you must explicitly wrap objects. Spring AOP uses CGLIB proxies to apply decorators transparently at runtime, matching what Python decorators do at function-definition time.
 
 ## 🎯 Interview Questions
 

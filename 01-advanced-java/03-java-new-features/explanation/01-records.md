@@ -1,5 +1,19 @@
 # Records — Immutable Data Classes (Java 16+)
 
+## Diagram: Record Compilation
+
+```mermaid
+flowchart TD
+    A["public record User(\n  String name,\n  int age\n) {}"] --> B["javac compiles to\nfinal class User extends Record"]
+    B --> C["private final String name\nprivate final int age\n(automatically added)"]
+    B --> D["public User(String name, int age)\nCompact canonical constructor\n(auto-generated)"]
+    B --> E["public String name()\npublic int age()\n(accessor methods — no get prefix!)"]
+    B --> F["public boolean equals(Object)\nhashCode()\ntoString()\n(auto-generated, correct)"]
+
+    G["Custom compact constructor\nfor validation:"] --> H["public record User(String name, int age) {\n  public User {\n    if (age < 0) throw new ...\n  }\n}"]
+    H --> I["Validates before\nassigning fields"]
+```
+
 ## The Problem Records Solve
 
 ```
@@ -101,6 +115,22 @@ public record Product(String name, double price, int quantity) {
 Use Records for: DTOs, value objects, API responses, config properties.
 Use POJO for: JPA entities (need mutable state + default constructor).
 ```
+
+---
+
+## Python Bridge
+
+| Java Record | Python Equivalent |
+|---|---|
+| `public record User(String name, int age) {}` | `@dataclass(frozen=True) class User: name: str; age: int` |
+| Accessor: `user.name()` (no `get` prefix) | Attribute: `user.name` |
+| Auto-generated `equals()` / `hashCode()` | `@dataclass` generates `__eq__` automatically |
+| `toString()` → `User[name=John, age=25]` | `__repr__` → `User(name='John', age=25)` |
+| Compact constructor for validation | `__post_init__` in `@dataclass` |
+| `record Point(int x, int y)` in switch | Python `match` with `case Point(x=x, y=y):` |
+| Records as Map keys (hashCode stable) | Frozen dataclass or `NamedTuple` as dict key |
+
+**Critical Difference:** Java records have `final` fields enforced by the compiler — you literally cannot add setter-like mutation. Python's `@dataclass(frozen=True)` achieves the same but via a runtime `FrozenInstanceError` on assignment. Java records cannot extend any class (they always extend `java.lang.Record`); Python dataclasses can freely inherit. Use Java records for DTOs, value objects, and `switch` pattern matching targets.
 
 ---
 

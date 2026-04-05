@@ -1,5 +1,26 @@
 # Template Method Pattern — Define the Skeleton
 
+## Diagram: Template Method Execution Skeleton
+
+```mermaid
+flowchart TD
+    A["processor.process()\nabstract DataProcessor"] --> B["1. connect()\nconcrete — base class"]
+    B --> C["2. extract()\nABSTRACT — subclass MUST implement"]
+    C --> D["3. transform()\nABSTRACT — subclass MUST implement"]
+    D --> E["4. load()\nconcrete — base class"]
+    E --> F["5. cleanup()\nHOOK — subclass CAN override\n(empty default)"]
+
+    G["CsvProcessor\nextends DataProcessor"] --> C
+    G --> D
+    H["ApiProcessor\nextends DataProcessor"] --> C
+    H --> D
+    H --> F
+
+    style C fill:#ffd43b
+    style D fill:#ffd43b
+    style F fill:#74c0fc
+```
+
 ## The Problem
 
 ```
@@ -120,6 +141,18 @@ Other Spring Templates:
 ```
 
 ---
+
+## Python Bridge
+
+| Java Template Method | Python Equivalent |
+|---|---|
+| `abstract class DataProcessor` | Class with `@abstractmethod` from `abc` module |
+| `public final void process()` | Method that calls `self._extract()` — no `final` in Python |
+| `protected abstract void extract()` | `@abstractmethod def extract(self)` |
+| Hook method (empty default) | Method with empty `pass` body — subclass can override |
+| `JdbcTemplate.query(sql, RowMapper)` | No direct equiv; Python ORMs handle this internally |
+
+**Critical Difference:** Python has no `final` keyword — nothing prevents a subclass from overriding the template method itself. Java's `final` enforces the Hollywood Principle mechanically; Python relies on convention and documentation. Also, Python's multiple inheritance and mixins offer an alternative to Template Method for composing behavior — e.g., a `LoggingMixin` that overrides `process()` and calls `super().process()`.
 
 ## 🎯 Interview Questions
 

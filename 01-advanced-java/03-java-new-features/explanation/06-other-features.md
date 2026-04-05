@@ -1,5 +1,22 @@
 # Sequenced Collections & Other Java 21 Features
 
+## Diagram: Sequenced Collections Hierarchy
+
+```mermaid
+flowchart TD
+    A["SequencedCollection\nNew Java 21 interface"] --> B["getFirst() / getLast()\naddFirst() / addLast()\nremoveFirst() / removeLast()\nreversed()"]
+    B --> C["List\n(implements SequencedCollection)"]
+    B --> D["Deque\n(implements SequencedCollection)"]
+    B --> E["LinkedHashSet\n(implements SequencedSet)"]
+
+    F["SequencedMap\nNew Java 21 interface"] --> G["firstEntry() / lastEntry()\nputFirst() / putLast()\nreversed()"]
+    G --> H["LinkedHashMap\n(implements SequencedMap)"]
+    G --> I["TreeMap\n(implements SequencedMap)"]
+
+    J["Before Java 21:\nlist.get(list.size()-1)"] --> K["After Java 21:\nlist.getLast()"]
+    style K fill:#51cf66
+```
+
 ## 1. Sequenced Collections (Java 21)
 
 ```
@@ -87,6 +104,20 @@ module-info.java:
 │ Know the concept, don't worry about daily use.        │
 └──────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Python Bridge
+
+| Java Java 21 Feature | Python Equivalent |
+|---|---|
+| `list.getFirst()` / `list.getLast()` | `lst[0]` / `lst[-1]` — Python always had this |
+| `collection.reversed()` | `reversed(lst)` — returns iterator |
+| `SequencedMap.firstEntry()` | Python `dict` preserves insertion order (3.7+); `next(iter(d.items()))` |
+| String templates (preview) | Python f-strings `f"Hello {name}"` — mature feature |
+| `instanceof` pattern variable | Python `isinstance()` + manual assignment |
+
+**Critical Difference:** Many Java 21 "new features" are catching up to things Python has had for years. Python's negative indexing (`lst[-1]` for last element) is far more elegant than Java's `list.getLast()`. Python dicts maintain insertion order since Python 3.7; Java needed `LinkedHashMap` to achieve this, and only in Java 21 does `SequencedMap` give it a first-class API. This context matters for interviews: understand *why* these features arrived late in Java (static typing + backwards compatibility constraints).
 
 ---
 

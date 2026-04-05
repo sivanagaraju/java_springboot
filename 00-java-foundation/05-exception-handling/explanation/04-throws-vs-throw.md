@@ -1,5 +1,25 @@
 # `throws` vs `throw`: Declaration vs Instantiation
 
+## Diagram: throws vs throw in the Call Stack
+
+```mermaid
+flowchart TD
+    A["methodC() throws IOException\n— declaration: callers must handle"] --> B["methodB() calls methodC()\nmust catch OR re-declare throws"]
+    B --> C{"Handles it?"}
+    C -- "catch(IOException e)" --> D["Exception consumed here\ncaller of B sees nothing"]
+    C -- "throws IOException" --> E["Propagates up\nmethodA() must handle"]
+
+    F["throw new IOException('msg')\n— action: create + launch exception"] --> G["Exception object allocated on Heap"]
+    G --> H["Stack unwinds\neach frame popped"]
+    H --> I{"Frame has\nmatching catch?"}
+    I -- Yes --> J["Caught — execution\ncontinues after catch block"]
+    I -- No --> K["Frame popped\nnext frame checked"]
+    K --> H
+
+    L["Checked exceptions\n(IOException, SQLException)\nMUST declare or catch"] --> A
+    M["Unchecked exceptions\n(RuntimeException, Error)\nNO declaration required"] --> F
+```
+
 ## The Two Keywords
 
 These look similar but serve completely different purposes:

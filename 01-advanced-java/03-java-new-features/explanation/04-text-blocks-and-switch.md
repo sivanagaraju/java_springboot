@@ -1,5 +1,22 @@
 # Text Blocks & Enhanced Switch — Clean Syntax (Java 13+)
 
+## Diagram: Enhanced Switch Expression Forms
+
+```mermaid
+flowchart TD
+    A["switch expression\n(Java 14+ — returns value)"] --> B{"Arrow or\nColon form?"}
+    B --> C["Arrow →\ncase X -> expression\nNo fall-through\nNo break needed"]
+    B --> D["Colon :\ncase X: yield value;\nExplicit yield\nCan fall-through"]
+
+    C --> E["String result = switch(day) {\n  case MON, TUE -> 'Weekday';\n  case SAT, SUN -> 'Weekend';\n};\n// Compiler checks exhaustiveness"]
+
+    F["Text Block\nJava 13+"] --> G["\"\"\" ... \"\"\"\nTriple-quote delimiter\nLeading whitespace stripped\nEscape sequences preserved"]
+    G --> H["String sql = \"\"\"\n    SELECT *\n    FROM users\n    WHERE id = ?\n    \"\"\";\n// Clean, readable, no \\n needed"]
+
+    style E fill:#51cf66
+    style H fill:#51cf66
+```
+
 ## 1. Text Blocks
 
 ```
@@ -116,6 +133,21 @@ var map  = Map.of("key", "value");    // immutable Map
 // Before: NullPointerException at line 42
 // After:  Cannot invoke "String.length()" because "user.getAddress().getCity()" is null
 ```
+
+---
+
+## Python Bridge
+
+| Java Feature | Python Equivalent |
+|---|---|
+| Text block `""" ... """` | Triple-quoted string `""" ... """` — identical syntax! |
+| `\s` to preserve trailing space | No equivalent needed — Python preserves spaces |
+| `String.formatted("Hello %s")` | `f"Hello {name}"` (f-string) |
+| Switch expression `case X -> value` | No direct equivalent — Python uses dict or match |
+| `switch` with multiple labels `case A, B ->` | `case 'A' | 'B':` in Python match |
+| `var x = new ArrayList<String>()` | Python has dynamic typing — `var` equivalent is normal |
+
+**Critical Difference:** Java text blocks use `"""` — the same syntax as Python triple-quoted strings. However, Java text blocks intelligently strip common leading whitespace (incidental indentation), making indented code readable. Python triple-quoted strings preserve ALL whitespace literally — you need `textwrap.dedent()` for the same effect. Java's enhanced switch expression (returns a value) is a major improvement over Python's lack of switch — Python's `match` statement is closer but still statement-based.
 
 ---
 

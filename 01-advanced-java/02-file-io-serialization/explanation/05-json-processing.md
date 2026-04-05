@@ -1,5 +1,22 @@
 # JSON Processing — Jackson ObjectMapper
 
+## Diagram: Jackson Serialization Pipeline
+
+```mermaid
+flowchart TD
+    A["HTTP Request\n{\"name\":\"John\",\"age\":25}"] --> B["Spring @RequestBody\ntriggers Jackson"]
+    B --> C["ObjectMapper.readValue()\nJSON → Java object"]
+    C --> D["User{name='John', age=25}\nDeserializedObject"]
+
+    E["Java Object\nUser{name='John', age=25}"] --> F["ObjectMapper.writeValueAsString()\nJava object → JSON"]
+    F --> G["HTTP Response\n{\"name\":\"John\",\"age\":25}"]
+
+    H["Jackson annotations control mapping:"] --> I["@JsonProperty('user_name')\nrename field in JSON"]
+    H --> J["@JsonIgnore\nexclude field from JSON"]
+    H --> K["@JsonFormat(pattern='yyyy-MM-dd')\ndate formatting"]
+    H --> L["@JsonInclude(NON_NULL)\nomit null fields"]
+```
+
 ## Why Jackson?
 
 ```
@@ -106,6 +123,22 @@ Custom config:
           .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 ```
+
+---
+
+## Python Bridge
+
+| Java Jackson | Python Equivalent |
+|---|---|
+| `ObjectMapper.writeValueAsString(obj)` | `json.dumps(obj.__dict__)` or Pydantic `.json()` |
+| `ObjectMapper.readValue(json, User.class)` | `json.loads(json_str)` or Pydantic `User.parse_raw(json)` |
+| `@JsonProperty("user_name")` | Pydantic `Field(alias="user_name")` |
+| `@JsonIgnore` | Pydantic `Field(exclude=True)` |
+| `@JsonFormat(pattern="yyyy-MM-dd")` | Pydantic `validator` or `json_encoders` |
+| `@JsonInclude(NON_NULL)` | Pydantic `model_config = {'exclude_none': True}` |
+| `@RequestBody User user` | FastAPI `async def create(user: UserSchema)` |
+
+**Critical Difference:** Pydantic (Python) validates and coerces types at runtime — `User(age="25")` becomes `User(age=25)`. Jackson (Java) is stricter — type mismatches throw `JsonMappingException`. Pydantic's approach is more forgiving for external APIs; Jackson's strictness catches data contract violations earlier. Spring Boot's `@Valid` annotation adds the explicit validation layer that Pydantic includes by default.
 
 ---
 

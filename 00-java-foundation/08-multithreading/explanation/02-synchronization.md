@@ -1,5 +1,23 @@
 # Synchronization: Protecting Shared State
 
+## Diagram: Synchronization Mechanisms
+
+```mermaid
+flowchart TD
+    A["Shared Mutable State"] --> B{"Thread-safety needed?"}
+    B --> C["Simple counter/flag"]
+    B --> D["Complex critical section"]
+    B --> E["Read visibility only"]
+
+    C --> F["AtomicInteger\nAtomicLong\nAtomicReference\n— CAS, lock-free"]
+    D --> G["synchronized block\nor method\n— mutex lock"]
+    E --> H["volatile field\n— visibility only\n— no atomicity"]
+
+    F --> I["Best performance\nunder contention"]
+    G --> J["Deadlock risk if\nnot careful"]
+    H --> K["Only for simple\nboolean flags"]
+```
+
 ## The Problem: Race Conditions
 
 When two threads read-modify-write the same variable, the result depends on timing:
@@ -158,6 +176,22 @@ DEADLOCK: Two threads, two locks, circular wait
 │              │  sections  │  variables │  updates             │
 └──────────────┴────────────┴────────────┴──────────────────────┘
 ```
+
+---
+
+## Python Bridge
+
+| Java Synchronization | Python Equivalent |
+|---|---|
+| `synchronized` block | `with threading.Lock():` |
+| `ReentrantLock` | `threading.RLock()` |
+| `volatile` | No direct equiv (Python GIL provides visibility) |
+| `AtomicInteger` | `threading.Lock()` + manual CAS, or use `queue.Queue` |
+| `wait()` / `notify()` | `threading.Condition.wait()` / `.notify()` |
+| Deadlock (two locks) | Same deadlock risk in Python |
+| `synchronized(this)` | `with self.lock:` (explicit lock object) |
+
+**Critical Difference:** Python's GIL (Global Interpreter Lock) prevents true parallel CPU execution in CPython, so many race conditions that appear in Java don't manifest in Python's CPython runtime. However, Python code using `multiprocessing` or running on Jython/GraalVM Python can have the same races. Always write thread-safe code regardless.
 
 ---
 

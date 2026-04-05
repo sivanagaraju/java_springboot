@@ -1,5 +1,24 @@
 # Serialization — Object ↔ Bytes
 
+## Diagram: Serialization Pipeline
+
+```mermaid
+flowchart TD
+    A["Java Object\nUser{name='John', age=25}"] --> B["ObjectOutputStream\n.writeObject(user)"]
+    B --> C["JVM writes:\n- Class descriptor + serialVersionUID\n- Field values\n- Referenced objects recursively"]
+    C --> D["Byte stream\n[AC ED 00 05 73 72 ...]"]
+    D --> E["FileOutputStream\nor network socket\nor database BLOB"]
+
+    F["Byte stream\nfrom file/network"] --> G["ObjectInputStream\n.readObject()"]
+    G --> H{"serialVersionUID\nmatch?"}
+    H -- No --> I["InvalidClassException\n⚠️ Version mismatch"]
+    H -- Yes --> J["Object reconstructed\nON HEAP\nwithout calling constructor!"]
+    J --> K["transient fields\nare null/0 — not restored"]
+
+    style I fill:#ff6b6b
+    style J fill:#ffd43b
+```
+
 ## What is Serialization?
 
 ```
@@ -95,6 +114,22 @@ Use instead: JSON (Jackson), Protocol Buffers, Avro
 │   → New fields get default values on deserialization  │
 └────────────────────────────────────────────────────┘
 ```
+
+---
+
+## Python Bridge
+
+| Java Serialization | Python Equivalent |
+|---|---|
+| `implements Serializable` | `pickle.dumps(obj)` — any object |
+| `ObjectOutputStream.writeObject(obj)` | `pickle.dumps(obj)` |
+| `ObjectInputStream.readObject()` | `pickle.loads(data)` |
+| `transient` field (excluded) | Override `__getstate__` to exclude fields |
+| `serialVersionUID` | No equivalent — pickle is more fragile |
+| `readObject()` / `writeObject()` custom | `__reduce__` or `__getstate__` / `__setstate__` |
+| Jackson `@JsonIgnore` | Pydantic `Field(exclude=True)` |
+
+**Critical Difference:** Python's `pickle` is simpler but **less safe** — unpickling untrusted data is a remote code execution vulnerability (same as Java's native deserialization). Both Java (via `ObjectInputStream` gadget chains) and Python `pickle` have had critical deserialization CVEs. In practice, always prefer JSON/Protobuf over native serialization for data exchange. Use Java serialization only for short-lived caches.
 
 ---
 

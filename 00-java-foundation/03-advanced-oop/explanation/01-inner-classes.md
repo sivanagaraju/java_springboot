@@ -4,6 +4,41 @@ Inner classes (or nested classes) are classes defined within another class. Whil
 
 Understanding how the JVM processes inner classes separates a junior developer from a deep practitioner.
 
+## Diagram: Inner Class Type Hierarchy
+
+```mermaid
+classDiagram
+    class OuterClass {
+        +staticNestedClass()
+        +innerClass()
+        +localClass()
+        +anonymousClass()
+    }
+    class StaticNestedClass {
+        <<static>>
+        no Outer ref
+        use: Outer.Inner
+    }
+    class NonStaticInnerClass {
+        holds Outer ref
+        use: outer.new Inner()
+        memory leak risk!
+    }
+    class LocalClass {
+        inside method only
+        captures effectively final vars
+    }
+    class AnonymousClass {
+        no name
+        implements interface/extends class inline
+    }
+
+    OuterClass --> StaticNestedClass : contains (no instance link)
+    OuterClass --> NonStaticInnerClass : contains (holds Outer.this)
+    OuterClass --> LocalClass : contains in method
+    OuterClass --> AnonymousClass : contains inline
+```
+
 ## The Core Concept: Nested vs. Inner
 
 Java distinctly categorizes these into two families:

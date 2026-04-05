@@ -1,5 +1,29 @@
 # Executors, Future, and CompletableFuture
 
+## Diagram: ExecutorService and CompletableFuture Flow
+
+```mermaid
+flowchart TD
+    A["Task to execute\nasynchronously"] --> B{"Return value\nneeded?"}
+    B -- No --> C["executor.execute(Runnable)\nfire-and-forget"]
+    B -- Yes --> D["executor.submit(Callable)\nreturns Future&lt;T&gt;"]
+
+    D --> E["future.get()\nBLOCKS calling thread\nuntil result ready"]
+    D --> F["CompletableFuture.supplyAsync(supplier, executor)\nnon-blocking chain"]
+
+    F --> G["thenApply(fn)\ntransform result\n(map equivalent)"]
+    G --> H["thenCompose(fn)\nchain another async op\n(flatMap equivalent)"]
+    H --> I["thenCombine(other, fn)\nmerge two independent futures"]
+    I --> J["exceptionally(fn)\nhandle errors in pipeline"]
+    J --> K["thenAccept(consumer)\nconsume final result"]
+
+    L["CompletableFuture.allOf(f1,f2,f3)\nwait for ALL"] --> M["join() — get result\n(unchecked exception)"]
+    N["CompletableFuture.anyOf(f1,f2,f3)\nfirst to complete wins"] --> M
+
+    style E fill:#ff6b6b
+    style F fill:#51cf66
+```
+
 ## Why Not Create Threads Manually?
 
 Creating threads directly (`new Thread(...)`) is like allocating memory manually in C — it works, but it's error-prone and wasteful.

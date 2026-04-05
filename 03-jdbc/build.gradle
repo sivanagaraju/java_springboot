@@ -54,9 +54,20 @@ dependencies {
 //   ./gradlew :03-jdbc:run -PmainClass=com.springmastery.jdbc.demo.PreparedStatementDemo
 //   ./gradlew :03-jdbc:run -PmainClass=com.springmastery.jdbc.demo.TransactionDemo
 //   ./gradlew :03-jdbc:run -PmainClass=com.springmastery.jdbc.demo.HikariCPDemo
+//   ./gradlew :03-jdbc:run -PmainClass=com.springmastery.jdbc.demo.CRUDWithJDBC
 application {
     mainClass = providers.gradleProperty('mainClass')
         .orElse('com.springmastery.jdbc.demo.JdbcConnectionDemo')
+}
+
+sourceSets {
+    main {
+        java {
+            // Explanation demos live outside src/main/java so learners can read
+            // the topic files and runnable code side-by-side in one folder tree.
+            srcDirs = ['01-jdbc-fundamentals/explanation']
+        }
+    }
 }
 
 tasks.named('run') {

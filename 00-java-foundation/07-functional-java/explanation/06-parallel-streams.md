@@ -1,5 +1,28 @@
 # Parallel Streams — When to Go Parallel (and When NOT to)
 
+## Diagram: Parallel Stream Fork/Join Execution
+
+```mermaid
+flowchart TD
+    A["list.parallelStream().map(fn).collect()"] --> B["ForkJoinPool.commonPool()\nDefault: CPU cores - 1 threads"]
+    B --> C["Spliterator splits source\ninto sub-tasks recursively"]
+    C --> D["Fork: distribute sub-tasks\nto worker threads"]
+    D --> E1["Thread 1\nprocess chunk 1"]
+    D --> E2["Thread 2\nprocess chunk 2"]
+    D --> E3["Thread N\nprocess chunk N"]
+    E1 --> F["Join: merge results\n(Collector must be concurrent-safe)"]
+    E2 --> F
+    E3 --> F
+    F --> G["Final result"]
+
+    H{"Worth parallelizing?"}
+    H -- "Large data N>10k\nCPU-bound\nNo shared mutable state\nSplittable source (ArrayList, array)" --> I["YES: use parallelStream()"]
+    H -- "Small N\nI/O-bound\nOrdered ops (findFirst)\nShared state (forEach + list.add)" --> J["NO: stick to sequential"]
+
+    style I fill:#51cf66
+    style J fill:#ff6b6b
+```
+
 ## Python → Java Mental Map
 
 | Python | Java |

@@ -63,6 +63,28 @@ Fix any failures before finishing.
 - Includes a self-scoring rubric
 - Used at phase completion to verify readiness before the next phase
 
+## Progressive Quiz Drill
+
+Use `resources/progressive-quiz-drill.md` when a sub-topic needs a deeper staged
+self-check. This is a support artifact, not a replacement for the module quiz.
+
+Format:
+- Round 1 â€” Core recall: definitions, defaults, naming, simple mechanics
+- Round 2 â€” Apply and compare: choose between two options and explain why
+- Round 3 â€” Debug the bug: broken code or failure mode analysis
+- Round 4 â€” Staff-level scenario: trade-offs, scale, reliability, production impact
+
+Rules:
+- Keep the drill short and progressive, usually 10â€“15 questions total
+- Do not show answers inline; keep a single Answer Key at the end
+- Each round must be harder than the one before it
+- Reuse the module's real concepts, not generic trivia
+
+For substantial deepening, create the full support pack alongside the drill in the
+same sub-topic `resources/` folder: `resources/one-page-cheat-sheet.md` and
+`resources/top-resource-guide.md`. The top resource guide must be curated external
+learning resources only: books, official docs, blogs, and videos.
+
 ## Hard rules
 
 - Answers must NEVER appear inline next to questions — always in a separate Answer Key section

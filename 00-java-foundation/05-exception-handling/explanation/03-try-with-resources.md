@@ -1,5 +1,26 @@
 # try-with-resources: Automatic Resource Management
 
+## Diagram: try-with-resources Close Sequence
+
+```mermaid
+flowchart TD
+    A["try (Resource r = new Resource())"] --> B["Enter try block\nResource is open"]
+    B --> C{"Exception\nthrown in body?"}
+    C -- No --> D["Body completes normally"]
+    C -- Yes --> E["Body exception saved\nas 'primary exception'"]
+    D --> F["r.close() called\nautomatically"]
+    E --> F
+    F --> G{"close() itself\nthrows exception?"}
+    G -- No --> H["Proceed normally\nor rethrow body exception"]
+    G -- Yes --> I{"Was there already\na body exception?"}
+    I -- No --> J["close() exception propagates"]
+    I -- Yes --> K["close() exception SUPPRESSED\nattached to primary exception\nvia addSuppressed()"]
+    K --> L["Primary body exception propagates\nclose() exception retrievable via\ngetSuppressed()"]
+
+    style K fill:#ffd43b
+    style L fill:#ff6b6b
+```
+
 ## The Problem: Resource Leaks
 
 Every time you open a file, database connection, or network socket, the OS allocates a **file descriptor**. If you forget to close it, you leak that descriptor. Leak enough of them and your application crashes with `Too many open files`.

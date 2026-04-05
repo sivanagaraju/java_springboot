@@ -2,6 +2,24 @@
 
 Polymorphism allows objects to be treated as instances of their parent class (or implemented interface) while ensuring their overridden behavior executes dynamically.
 
+## Diagram: V-Table Dispatch at Runtime
+
+```mermaid
+flowchart TD
+    A["Parent obj = new Child()"] --> B["obj.display() called"]
+    B --> C{"invokevirtual instruction\nlooks at actual heap object"}
+    C --> D["Finds Child V-Table\nin Metaspace"]
+    D --> E["Executes Child.display()\nnot Parent.display()"]
+
+    F["Interface ref\nRunnable r = new MyTask()"] --> G["r.run() called"]
+    G --> H{"invokeinterface instruction\nno fixed V-Table offset"}
+    H --> I["JVM searches class hierarchy\nfor run() implementation"]
+    I --> J["Executes MyTask.run()"]
+
+    style E fill:#51cf66,color:#000
+    style J fill:#74c0fc,color:#000
+```
+
 To truly understand Java Polymorphism, a Java Architect must understand the Bytecode instructions that handle method invocation:
 
 ## 1. `invokevirtual` (The Workhorse)

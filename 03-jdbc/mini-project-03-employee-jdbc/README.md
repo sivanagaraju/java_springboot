@@ -36,7 +36,7 @@ flowchart TD
 ## How to Run
 ```bash
 # Ensure PostgreSQL is running with springmastery database
-./gradlew :03-jdbc:run
+./gradlew :03-jdbc:mini-project-03-employee-jdbc:run
 ```
 
 ## Database Setup

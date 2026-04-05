@@ -1,5 +1,25 @@
 # Set & Map: Hashing Internals
 
+## Diagram: HashMap Put Operation Flow
+
+```mermaid
+flowchart TD
+    A["map.put(key, value)"] --> B["key.hashCode()"]
+    B --> C["Spread hash:\n(h >>> 16) XOR h"]
+    C --> D["bucket index =\nhash AND (capacity-1)"]
+    D --> E{"Bucket empty?"}
+    E -- Yes --> F["Insert new Node\nat bucket"]
+    E -- No --> G{"key.equals(existing)?"}
+    G -- Yes --> H["Replace value\n(update existing entry)"]
+    G -- No --> I["Collision!\nAdd to chain"]
+    I --> J{"Chain length\n>= 8 AND\ncapacity >= 64?"}
+    J -- Yes --> K["Treeify bucket:\nLinkedList → Red-Black Tree\nO(n) → O(log n)"]
+    J -- No --> L["Stay as LinkedList"]
+    F --> M{"size > capacity\n× loadFactor (0.75)?"}
+    M -- Yes --> N["Resize: double capacity\nRehash all entries"]
+    M -- No --> O["Done"]
+```
+
 ## HashMap: How It Actually Works
 
 HashMap is the most important collection to understand deeply. It appears in virtually every interview and every Spring application.

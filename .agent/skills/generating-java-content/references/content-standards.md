@@ -71,6 +71,20 @@ Each anti-pattern must follow this format:
 
 See Interview Questions Format section below.
 
+### 8. Sub-topic Support Pack
+
+If the topic is a substantial deepening, also create/update these files in the
+specific sub-topic folder under `resources/`:
+
+- `progressive-quiz-drill.md`
+- `one-page-cheat-sheet.md`
+- `top-resource-guide.md`
+
+Keep these concise, topic-specific, and aligned to the explanation set they support.
+`top-resource-guide.md` must contain curated external learning resources only:
+books, official docs, blogs, and videos. It is not for internal repo links or
+local file cross-references.
+
 ---
 
 ## Python Bridge Format Rules

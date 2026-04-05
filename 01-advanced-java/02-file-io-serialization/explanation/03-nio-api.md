@@ -1,5 +1,24 @@
 # NIO.2 API — Modern File Operations (Java 7+)
 
+## Diagram: NIO.2 Path Operations
+
+```mermaid
+flowchart TD
+    A["Path.of('data', 'users.csv')\n→ data/users.csv"] --> B{"File operation?"}
+    B --> C["Read entire file\nFiles.readString(path)\nor Files.readAllLines(path)"]
+    B --> D["Write entire file\nFiles.writeString(path, content)\nor Files.write(path, lines)"]
+    B --> E["List directory\nFiles.list(dirPath)\nreturns Stream&lt;Path&gt;"]
+    B --> F["Walk file tree\nFiles.walk(rootPath)\nrecursive Stream&lt;Path&gt;"]
+    B --> G["Watch for changes\nWatchService\nWatchKey events"]
+
+    C --> H["Throws IOException\n(checked exception)\nhandle or propagate"]
+    D --> H
+    E --> H
+    F --> H
+
+    style A fill:#51cf66
+```
+
 ## Old API vs New API
 
 ```
@@ -98,6 +117,23 @@ try (Stream<Path> matches = Files.find(
     matches.forEach(System.out::println);
 }
 ```
+
+---
+
+## Python Bridge
+
+| Java NIO.2 | Python Equivalent |
+|---|---|
+| `Path.of("data", "users.csv")` | `Path("data") / "users.csv"` (pathlib) |
+| `Files.readString(path)` | `path.read_text(encoding='utf-8')` |
+| `Files.writeString(path, content)` | `path.write_text(content)` |
+| `Files.list(dirPath)` | `path.iterdir()` |
+| `Files.walk(rootPath)` | `path.rglob("*")` or `os.walk()` |
+| `Files.exists(path)` | `path.exists()` |
+| `Files.copy(src, dst)` | `shutil.copy2(src, dst)` |
+| `WatchService` | `watchdog` library (third-party) |
+
+**Critical Difference:** Python's `pathlib.Path` is conceptually identical to Java's `java.nio.file.Path` — both represent paths as objects with rich methods rather than raw strings. Python adopted this approach later (Python 3.4) taking direct inspiration from Java NIO.2. Both should be preferred over their legacy equivalents (`java.io.File` vs `os.path` string operations).
 
 ---
 

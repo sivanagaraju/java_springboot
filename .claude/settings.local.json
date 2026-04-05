@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for skill:*)",
+      "Bash(do)",
+      "Bash(echo \"=== SKILL: $skill ===\")",
+      "Read(//c/Users/sivan/Learning/Code/java_springboot/.agent/skills/$skill/**)",
+      "Bash(done)",
+      "Bash(else echo:*)",
+      "Bash(fi)"
+    ]
+  }
+}

@@ -1,5 +1,30 @@
 # Streams API: Declarative Data Processing
 
+## Diagram: Stream Pipeline Execution Model
+
+```mermaid
+flowchart LR
+    A["Source\ncollection.stream()\nFiles.lines()\nStream.of()"] --> B
+
+    subgraph Intermediate["Intermediate Ops (LAZY — nothing runs yet)"]
+        B["filter(predicate)"] --> C["map(function)"]
+        C --> D["flatMap(function)"]
+        D --> E["sorted(comparator)"]
+        E --> F["distinct()\nlimit(n)\nskip(n)"]
+    end
+
+    F --> G
+
+    subgraph Terminal["Terminal Op (TRIGGERS execution)"]
+        G["collect()\nforEach()\nreduce()\ncount()\nfindFirst()\nanyMatch()"]
+    end
+
+    G --> H["Result\nList, Map, value,\nor side-effect"]
+
+    style Intermediate fill:#e8f4f8
+    style Terminal fill:#d4edda
+```
+
 ## What Is a Stream?
 
 A Stream is a **pipeline** for processing data declaratively — like SQL for collections.

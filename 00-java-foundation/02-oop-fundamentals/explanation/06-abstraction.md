@@ -2,6 +2,25 @@
 
 Abstraction allows you to define behaviors while deferring the actual structural implementation. But at a deep architectural level, deciding between an **Interface** and an **Abstract Class** drives deep impacts into the JVM execution pipeline.
 
+## Diagram: Abstract Class vs Interface Decision
+
+```mermaid
+flowchart TD
+    A["Need to define\nshared behavior?"] --> B{"Shared state\nor implementation?"}
+    B -- "YES: common fields\nor concrete methods" --> C["Abstract Class\nextends only one"]
+    B -- "NO: pure behavior\ncontract only" --> D["Interface\nimplements many"]
+
+    C --> E["Vehicle (abstract)\n- fuel level field\n- refuel() concrete method\n- drive() abstract"]
+    D --> F["Driveable (interface)\n- drive() default/abstract\n- no fields allowed"]
+
+    E --> G["Car extends Vehicle"]
+    D --> G
+    D --> H["Drone implements Driveable"]
+
+    style C fill:#74c0fc
+    style D fill:#51cf66
+```
+
 ## 1. Abstract Classes
 An `abstract class` is a class that cannot be instantiated (`new Shape()` is illegal). It can possess abstract methods (no logic body) AND concrete methods (with logic).
 

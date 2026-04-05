@@ -1,5 +1,26 @@
 # Comparable vs Comparator — The Sorting Contract
 
+## Diagram: Comparable vs Comparator Decision
+
+```mermaid
+flowchart TD
+    A["Need to sort objects?"] --> B{"Who defines\nthe ordering?"}
+    B --> C["The class itself\n(natural order)"]
+    B --> D["The caller\n(custom/external order)"]
+
+    C --> E["Implement Comparable&lt;T&gt;\noverride compareTo(T other)"]
+    D --> F["Pass Comparator&lt;T&gt;\nto sort()/Collections.sort()"]
+
+    E --> G["class Product\nimplements Comparable&lt;Product&gt;\n compareTo → by price"]
+    F --> H["Comparator.comparing(Product::getName)\n  .thenComparing(Product::getPrice)"]
+
+    G --> I["Collections.sort(list)\nlist.sort(null)\nTreeSet&lt;Product&gt; — uses natural order"]
+    H --> J["list.sort(comparator)\nCollections.sort(list, comparator)\nTreeSet&lt;&gt;(comparator)"]
+
+    style E fill:#74c0fc
+    style F fill:#51cf66
+```
+
 ## Python → Java Mental Map
 
 | Python | Java |

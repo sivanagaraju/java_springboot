@@ -1,5 +1,23 @@
 # Builder Pattern — Step-by-Step Construction
 
+## Diagram: Builder Construction Flow
+
+```mermaid
+flowchart LR
+    A["User.builder()"] --> B[".firstName('John')"]
+    B --> C[".lastName('Doe')"]
+    C --> D[".age(25)\n(optional)"]
+    D --> E[".city('NYC')\n(optional)"]
+    E --> F[".build()"]
+    F --> G{"Validation\nname == null?"}
+    G -- "Missing required" --> H["throw IllegalStateException\n'Name required'"]
+    G -- "Valid" --> I["new User(builder)\nall fields final\nimmutable object"]
+    I --> J["User returned\nto caller"]
+
+    style H fill:#ff6b6b
+    style I fill:#51cf66
+```
+
 ## The Problem
 
 ```
@@ -114,6 +132,18 @@ public class User {
 ```
 
 ---
+
+## Python Bridge
+
+| Java Builder | Python Equivalent |
+|---|---|
+| `User.builder().name("x").build()` | `@dataclass` with `field(default=None)` — keyword args |
+| `@Builder` (Lombok) | `@dataclass` auto-generates `__init__` |
+| `build()` with validation | `__post_init__` in `@dataclass` for validation |
+| `private User(Builder builder)` (immutable) | `@dataclass(frozen=True)` |
+| `ResponseEntity.ok().header(...).body(...)` | Method chaining via `return self` in Python |
+
+**Critical Difference:** Python's `@dataclass` with keyword arguments achieves the same readability without needing a separate Builder class. Java requires the Builder pattern because constructors only accept positional args and can't be named. With Java records (Java 16+), simple immutable data carriers no longer need Builder — but complex objects with many optional fields still benefit from `@Builder`.
 
 ## 🎯 Interview Questions
 

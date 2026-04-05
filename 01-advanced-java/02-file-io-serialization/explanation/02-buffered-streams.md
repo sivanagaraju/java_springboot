@@ -1,5 +1,22 @@
 # Buffered Streams — Performance Through Batching
 
+## Diagram: Buffered vs Unbuffered I/O
+
+```mermaid
+flowchart TD
+    A["Reading 1000 chars from file"] --> B{"Buffered?"}
+    B -- No --> C["FileReader alone\n1000 × syscall to OS\n1000 × disk seek\n~5 seconds"]
+    B -- Yes --> D["BufferedReader wrapping FileReader\n1 × syscall → fill 8192-char buffer\n999 reads from in-memory buffer\n~0.005 seconds"]
+
+    C --> E["Performance: 1000x slower"]
+    D --> F["Performance: fast"]
+
+    G["BufferedWriter.write(char)"] --> H["Accumulates in buffer\nuntil buffer full OR flush()"]
+    H --> I["Single OS write call\nwith full buffer"]
+    I --> J["ALWAYS call flush()\nor close() to push\nremaining buffer to disk"]
+    style J fill:#ff6b6b
+```
+
 ## Why Buffering Matters
 
 ```
@@ -94,6 +111,21 @@ flush() semantics:
 │ Call flush() after critical writes.          │
 └─────────────────────────────────────────────┘
 ```
+
+---
+
+## Python Bridge
+
+| Java Buffered I/O | Python Equivalent |
+|---|---|
+| `new BufferedReader(new FileReader(path))` | `open(path, 'r')` — buffered by default |
+| `new BufferedWriter(new FileWriter(path))` | `open(path, 'w')` — buffered by default |
+| `BufferedReader.readLine()` | `f.readline()` |
+| `BufferedWriter.newLine()` | `f.write('\n')` or `print(..., file=f)` |
+| `bw.flush()` | `f.flush()` — same concept |
+| `new BufferedInputStream(fis, 65536)` | `open(path, 'rb', buffering=65536)` |
+
+**Critical Difference:** Python's `open()` is buffered by default (unlike Java's `FileReader` which is unbuffered). This is a common Java trap: using `FileReader` directly in a loop is 100x slower than wrapping it with `BufferedReader`. Python developers never hit this issue because the buffering is automatic.
 
 ---
 

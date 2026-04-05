@@ -1,5 +1,23 @@
 # Singleton Pattern — One Instance to Rule Them All
 
+## Diagram: Singleton Initialization Strategies
+
+```mermaid
+flowchart TD
+    A["Need single instance?"] --> B{"Initialization timing?"}
+    B --> C["Always needed\nat startup"]
+    B --> D["May not be needed\nor heavy to create"]
+    C --> E["Eager Initialization\npublic static final INSTANCE\n= new Singleton()"]
+    D --> F{"Thread safety\ncritical?"}
+    F --> G["Double-Checked Locking\nvolatile + synchronized"]
+    F --> H["Bill Pugh Holder\nstatic inner class\n(JVM guarantees thread safety)"]
+    E --> I["✅ Simplest\n✅ Thread-safe by JVM\n❌ Created even if unused"]
+    G --> J["✅ Lazy\n✅ Thread-safe\n⚠️ volatile required"]
+    H --> K["✅ Lazy\n✅ Thread-safe\n✅ No sync overhead"]
+    L["Serialization/Reflection attacks?"] --> M["Enum Singleton\nenum Config { INSTANCE }\n✅ Best if no lazy init needed"]
+    N["Spring @Component"] --> O["✅ Use this in production\nSpring manages lifecycle"]
+```
+
 ## The Problem It Solves
 
 ```
@@ -158,6 +176,18 @@ public class UserService {
 ```
 
 ---
+
+## Python Bridge
+
+| Java Singleton | Python Equivalent |
+|---|---|
+| `enum Config { INSTANCE }` | Module-level instance: `_instance = Config()` in a module — Python modules are singletons |
+| `@Component` (Spring) | `@lru_cache` on factory function, or a module-level object |
+| `private static volatile instance` (DCL) | `threading.Lock()` + manual check |
+| Reflection-safe via Enum | Python has no reflection barrier — any `__class__()` call creates new instance |
+| `synchronized` class lock | `threading.Lock()` context manager |
+
+**Critical Difference:** Python's simplest singleton is just a module-level object — `import config` always returns the same module object. Java has no equivalent; you must explicitly enforce the pattern. Spring's `@Component` is the Java equivalent of Python's module-level singleton — both are effectively "one instance per container."
 
 ## 🎯 Interview Questions
 

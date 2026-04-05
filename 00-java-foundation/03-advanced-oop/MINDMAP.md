@@ -1,4 +1,4 @@
-# Advanced OOP — Concept Mindmap
+# Advanced OOP - Concept Mindmap
 
 - Advanced OOP
   - [Inner Classes](explanation/01-inner-classes.md)
@@ -9,22 +9,27 @@
   - [Enums](explanation/02-enums.md)
     - Compile-Time Type Safety
     - Implicitly Private Constructors
-    - Fields, Methods, & State
+    - Fields, Methods, and State
   - [Generics](explanation/03-generics.md)
     - Strong Typing without Casts
     - Type Erasure at Runtime
     - Bounded Types (`extends`)
     - Wildcards (`?`)
   - [Annotations](explanation/04-annotations.md)
-    - Metadata tags (no intrinsic behavior)
+    - Metadata tags with no intrinsic behavior
     - Retention (`SOURCE`, `CLASS`, `RUNTIME`)
-    - Reflection Processors
+    - Reflection processors
+  - [Records](explanation/07-records.md)
+    - Immutable value-based data carriers
+    - Compact constructors for validation
+    - Defensive copy for mutable inputs
+    - Natural fit for DTOs and API snapshots
   - Standard Classes
     - [Wrapper Classes](explanation/05-wrapper-classes.md)
-      - Autoboxing & Unboxing
-      - Value Caching (e.g. -128 to 127)
-      - Object Memory Overhead
+      - Autoboxing and unboxing
+      - Value caching (e.g. -128 to 127)
+      - Object memory overhead
     - [The Object Class](explanation/06-object-class.md)
       - `toString()`
       - `equals()` vs `==`
-      - `hashCode()` Golden Rule
+      - `hashCode()` golden rule

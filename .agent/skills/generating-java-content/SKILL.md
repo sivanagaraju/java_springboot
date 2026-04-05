@@ -42,6 +42,20 @@ After generating, self-review against the "What Immediately Fails the Standard"
 table in [references/content-standards.md](references/content-standards.md).
 Fix any failures before finishing. Do not deliver a file that fails even one check.
 
+## Sub-topic Support Pack
+
+When the topic is a substantial deepening, also create/update these files in the
+specific sub-topic folder under `resources/`:
+
+- `progressive-quiz-drill.md`
+- `one-page-cheat-sheet.md`
+- `top-resource-guide.md`
+
+Keep them short, topic-specific, and aligned to the explanation set they support.
+`top-resource-guide.md` must be curated external learning resources only:
+books, official docs, blogs, and videos. Do not treat it as a place for internal
+repo links or local file cross-references.
+
 ## Mandatory section order
 
 1. Opening: what this concept is + WHY it was invented (not just what it does)

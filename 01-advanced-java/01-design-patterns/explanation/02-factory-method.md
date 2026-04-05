@@ -1,5 +1,20 @@
 # Factory Method Pattern — Let Subclasses Decide
 
+## Diagram: Factory Method Structure
+
+```mermaid
+flowchart TD
+    A["Client needs\na Product"] --> B["Calls Creator.create()"]
+    B --> C{"Which ConcreteCreator\nis configured?"}
+    C --> D["EmailFactory.create()\n→ new EmailNotification()"]
+    C --> E["SmsFactory.create()\n→ new SmsNotification()"]
+    C --> F["PushFactory.create()\n→ new PushNotification()"]
+    D --> G["Notification interface\n.send(message)"]
+    E --> G
+    F --> G
+    H["Adding Slack?\nNew SlackFactory class only\nExisting code UNTOUCHED\n✅ Open/Closed Principle"] --> C
+```
+
 ## The Problem It Solves
 
 ```
@@ -109,6 +124,18 @@ Spring's ApplicationContext IS the factory.
 ```
 
 ---
+
+## Python Bridge
+
+| Java Factory Method | Python Equivalent |
+|---|---|
+| `interface NotificationFactory { Notification create(); }` | Protocol class or callable returning base type |
+| Concrete factory subclass | Function returning the concrete type |
+| `@Bean` method in `@Configuration` | FastAPI dependency function: `def get_service() -> Service` |
+| `BeanFactory` / `ApplicationContext` | FastAPI `Depends()` container |
+| `FactoryBean<T>` | `functools.lru_cache` wrapping a factory function |
+
+**Critical Difference:** Python uses duck typing — no interface is needed. A factory is simply any callable that returns the right type. Java's static typing requires the `interface`/`abstract` contract to be explicit. Spring's `@Bean` method is the most common Java factory you'll write day-to-day, and it maps directly to FastAPI's dependency injection functions.
 
 ## 🎯 Interview Questions
 

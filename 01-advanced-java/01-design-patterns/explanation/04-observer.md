@@ -1,5 +1,20 @@
 # Observer Pattern — Event-Driven Communication
 
+## Diagram: Spring Event Flow
+
+```mermaid
+flowchart TD
+    A["OrderService.placeOrder()\n@Service"] --> B["publisher.publishEvent(\nnew OrderPlacedEvent())"]
+    B --> C["Spring ApplicationEventMulticaster\ndispatches to registered listeners"]
+    C --> D["@EventListener\nEmailService.handleOrder()\n(synchronous — same thread)"]
+    C --> E["@Async @EventListener\nInventoryService.handleOrder()\n(new thread from pool)"]
+    C --> F["@EventListener\nAnalyticsService.track()\n(synchronous)"]
+    D --> G["Send confirmation email"]
+    E --> H["Reduce stock\n(non-blocking)"]
+    F --> I["Record purchase metrics"]
+    J["Adding LoyaltyService?\nAdd @EventListener to it\nOrderService UNCHANGED\n✅ Open/Closed"] --> C
+```
+
 ## The Problem
 
 ```
@@ -124,6 +139,18 @@ public class InventoryService {
 ```
 
 ---
+
+## Python Bridge
+
+| Java Observer / Spring Events | Python Equivalent |
+|---|---|
+| `ApplicationEventPublisher.publishEvent()` | Python `signal` library, or FastAPI `BackgroundTasks` |
+| `@EventListener` | `@receiver` in Django signals, or explicit callback registration |
+| `@Async @EventListener` | FastAPI `BackgroundTasks.add_task()` |
+| `publisher.publishEvent(new OrderEvent())` | `asyncio.create_task()` for async side-effects |
+| Synchronous `@EventListener` | `signal.send()` in Django (synchronous) |
+
+**Critical Difference:** Python async frameworks (FastAPI) use `BackgroundTasks` for post-request side effects — which is exactly what `@Async @EventListener` does in Spring. Django's signal system is synchronous-first, like Spring's default `@EventListener`. The key advantage of Spring's system over manual callbacks is transaction awareness: `@TransactionalEventListener(phase=AFTER_COMMIT)` fires only after a successful commit — no equivalent in Python ORMs without manual wiring.
 
 ## 🎯 Interview Questions
 

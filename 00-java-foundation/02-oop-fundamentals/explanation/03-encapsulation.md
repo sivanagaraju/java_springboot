@@ -3,6 +3,26 @@
 At a naive level, Encapsulation is just "making variables private and making getters/setters public." 
 To an Architect, Encapsulation is the defensive perimeter around your domain model ensuring that an object's state transition can never bypass validation criteria. 
 
+## Diagram: Encapsulation as a Protective Perimeter
+
+```mermaid
+classDiagram
+    class UserAccount {
+        -int accountBalance
+        -String email
+        +withdraw(amount) void
+        +deposit(amount) void
+        +getBalance() int
+    }
+
+    class ExternalCallers {
+        <<caller>>
+    }
+
+    ExternalCallers --> UserAccount : calls public API only
+    note for UserAccount "Private fields: no direct access\nPublic methods: validated entry points\nState transitions always go through validation"
+```
+
 ## The Core Concept
 Data fields dictate internal truth. If memory fields are `public`, any external thread or routine can violently overwrite them.
 By marking fields `private`, you force the JVM compiler to reject external access. By providing `public` methods (`getAge()`, `setAge()`), you establish an exclusive **API contract** that allows you to inject validation logic seamlessly without restructuring downstream consumers.

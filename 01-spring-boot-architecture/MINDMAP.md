@@ -1,21 +1,25 @@
 # 01 - Spring Boot Architecture Master Mindmap
 
-This mindmap covers the foundational architecture of Spring and the productivity "magic" of Spring Boot.
-
-- [Spring Boot Architecture](./)
-  - [01 - Inversion of Control & DI](./01-inversion-of-control)
-    - [What is IoC?](./01-inversion-of-control/explanation/01-what-is-ioc.md)
-    - [Dependency Injection](./01-inversion-of-control/explanation/02-dependency-injection.md)
-    - [Spring Bean Context](./01-inversion-of-control/explanation/03-spring-bean-context.md)
-    - [Bean Scopes & Lifecycle](./01-inversion-of-control/explanation/04-bean-scopes-lifecycle.md)
+- Spring Boot Architecture
+  - [README](./README.md)
+  - 01 - Inversion of Control & DI
+    - [README](./01-inversion-of-control/README.md)
+    - [What is IoC?](./01-inversion-of-control/explanation/01-tight-coupling-vs-ioc.md)
+    - [Spring Application Context](./01-inversion-of-control/explanation/02-spring-application-context.md)
+    - [Dependency Injection Types](./01-inversion-of-control/explanation/03-dependency-injection-types.md)
+    - [Bean Lifecycle and Scopes](./01-inversion-of-control/explanation/04-bean-lifecycle-and-scopes.md)
     - [Component Scanning](./01-inversion-of-control/explanation/05-component-scanning.md)
-  - [02 - Spring Boot Magic](./02-spring-boot-magic)
+  - 02 - Spring Boot Magic
+    - [README](./02-spring-boot-magic/README.md)
     - [What is Spring Boot?](./02-spring-boot-magic/explanation/01-what-is-spring-boot.md)
     - [Auto-Configuration](./02-spring-boot-magic/explanation/02-understanding-autoconfiguration.md)
     - [Starters](./02-spring-boot-magic/explanation/03-understanding-starters.md)
     - [Application Properties](./02-spring-boot-magic/explanation/04-application-properties.md)
-  - [Deep Practitioner Standards](../README.md)
-    - 4-Layer Commenting
-    - Python vs. Java Comparisons
-    - Mermaid Flowcharts
-    - Interview Prep
+    - [Profiles and Conditional Beans](./02-spring-boot-magic/explanation/05-profiles-and-conditional-beans.md)
+    - [AutoConfigurationDemo.java](./02-spring-boot-magic/explanation/AutoConfigurationDemo.java)
+    - [ConditionalDemo.java](./02-spring-boot-magic/explanation/ConditionalDemo.java)
+  - Deep Practitioner Standards
+    - 4-layer Java commenting
+    - Python bridge comparisons
+    - Mermaid diagrams in explanation files
+    - Interview questions at the end of every explanation

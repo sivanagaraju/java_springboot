@@ -1,5 +1,28 @@
 # List Implementations: ArrayList vs LinkedList
 
+## Diagram: ArrayList vs LinkedList Decision
+
+```mermaid
+flowchart TD
+    A["Need a List?"] --> B{"Primary operation?"}
+    B --> C["Random access\nget(index)"]
+    B --> D["Frequent insert/delete\nin the middle"]
+    B --> E["Stack / Queue\nadd/remove at ends"]
+
+    C --> F["ArrayList\nO(1) get, O(n) insert-middle"]
+    D --> G{"Size known\nin advance?"}
+    G -- Yes --> H["ArrayList with\ninitialCapacity hint"]
+    G -- No --> I["LinkedList\nO(1) insert if you have iterator"]
+    E --> J["ArrayDeque\nfaster than LinkedList for ends"]
+
+    F --> K["Backed by Object array\nCPU cache-friendly"]
+    I --> L["Doubly-linked nodes\nPointer overhead: 2 refs per node"]
+
+    style F fill:#51cf66
+    style J fill:#51cf66
+    style I fill:#ff6b6b
+```
+
 ## The Default Choice: ArrayList
 
 ArrayList is backed by an internal `Object[]` array. For 99% of use cases, ArrayList is the correct choice.
