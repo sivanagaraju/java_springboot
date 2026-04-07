@@ -1,0 +1,132 @@
+// ╔═══════════════════════════════════════════════════════════════════════╗
+// ║  MODULE  : 04-hibernate-jpa                                           ║
+// ║  PURPOSE : Hibernate ORM fundamentals — entity mapping, relationships,║
+// ║            JPQL queries, caching, and optimistic locking              ║
+// ║                                                                       ║
+// ║  RUN DEMOS:                                                           ║
+// ║    ./gradlew :04-hibernate-jpa:run \                                  ║
+// ║        -PmainClass=com.learning.hibernate.basics.ORMConceptDemo       ║
+// ║    ./gradlew :04-hibernate-jpa:run \                                  ║
+// ║        -PmainClass=com.learning.hibernate.relationships.NPlusOneDemo  ║
+// ║    ./gradlew :04-hibernate-jpa:run \                                  ║
+// ║        -PmainClass=com.learning.hibernate.advanced.LockingDemo        ║
+// ║                                                                       ║
+// ║  RUN MINI-PROJECT:                                                    ║
+// ║    ./gradlew :04-hibernate-jpa:run \                                  ║
+// ║        -PmainClass=com.learning.blog.BlogApp                          ║
+// ║                                                                       ║
+// ║  TEST:                                                                ║
+// ║    ./gradlew :04-hibernate-jpa:test                                   ║
+// ╠═══════════════════════════════════════════════════════════════════════╣
+// ║  DEPENDENCY MAP                                                       ║
+// ║                                                                       ║
+// ║   Your Code                                                           ║
+// ║       │                                                               ║
+// ║       ├──► jakarta.persistence-api  ← JPA 3.1 standard spec          ║
+// ║       │        (annotations: @Entity, @Table, @OneToMany, etc.)       ║
+// ║       │                                                               ║
+// ║       ├──► hibernate-core           ← JPA provider / ORM engine      ║
+// ║       │        (SessionFactory, Session, JPQL execution)              ║
+// ║       │                                                               ║
+// ║       ├──► h2                       ← In-memory RDBMS (no Docker!)    ║
+// ║       │        (demos and mini-project use H2 for portability)        ║
+// ║       │                                                               ║
+// ║       └──► slf4j-simple             ← Logging (Hibernate emits SQL)   ║
+// ║                                                                       ║
+// ║  Python equivalents:                                                  ║
+// ║    jakarta.persistence-api  →  sqlalchemy (ORM spec/interface)        ║
+// ║    hibernate-core           →  sqlalchemy (ORM implementation)        ║
+// ║    h2                       →  sqlite3 (in-process, no server needed) ║
+// ║    slf4j-simple             →  Python logging module                  ║
+// ║                                                                       ║
+// ║  pip equivalent:                                                      ║
+// ║    pip install sqlalchemy alembic aiosqlite                           ║
+// ╚═══════════════════════════════════════════════════════════════════════╝
+
+plugins {
+    id 'java'
+    id 'application'
+}
+
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // ── JPA 3.1 Specification API ──────────────────────────────────────────
+    // Defines the standard annotations and interfaces (@Entity, @OneToMany,
+    // EntityManager, etc.). This is the "interface" — Hibernate implements it.
+    // Python equivalent: SQLAlchemy's declarative_base and Column() interface.
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+    // ── Hibernate ORM 6.4 (JPA Provider) ──────────────────────────────────
+    // The actual ORM engine that executes JPQL, manages sessions, generates
+    // DDL, handles lazy loading, caching, and all entity lifecycle events.
+    // Hibernate 6.x requires jakarta.* — never javax.*.
+    // Python equivalent: SQLAlchemy's engine + Session + ORM mapper.
+    implementation 'org.hibernate.orm:hibernate-core:6.4.4.Final'
+
+    // ── H2 In-Memory Database ──────────────────────────────────────────────
+    // A pure-Java SQL database that runs inside the JVM — no Docker, no
+    // installation. Perfect for demos and learning. Schema is created and
+    // dropped automatically via hibernate.hbm2ddl.auto=create-drop.
+    // Python equivalent: SQLite via sqlite3 or aiosqlite.
+    implementation 'com.h2database:h2:2.2.224'
+
+    // ── SLF4J Simple Logging ───────────────────────────────────────────────
+    // Hibernate emits SQL statements and lifecycle events via SLF4J.
+    // Without this, you get "SLF4J: No SLF4J providers found" warnings.
+    // Python equivalent: import logging; logging.basicConfig(level=logging.DEBUG)
+    implementation 'org.slf4j:slf4j-simple:2.0.12'
+
+    // ── JUnit 5 for Tests ──────────────────────────────────────────────────
+    // Jupiter = JUnit 5 test engine. Run: ./gradlew :04-hibernate-jpa:test
+    // Python equivalent: pytest
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+// ── Test Engine Configuration ──────────────────────────────────────────────
+// JUnit 5 requires explicit test platform activation in Gradle.
+// Without this, tests compile but never actually run.
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// ── Application Plugin Config ──────────────────────────────────────────────
+// Run any demo or the mini-project BlogApp with -PmainClass=<fully.qualified.ClassName>
+//
+// Example runs:
+//   ./gradlew :04-hibernate-jpa:run -PmainClass=com.learning.hibernate.basics.ORMConceptDemo
+//   ./gradlew :04-hibernate-jpa:run -PmainClass=com.learning.hibernate.relationships.NPlusOneDemo
+//   ./gradlew :04-hibernate-jpa:run -PmainClass=com.learning.hibernate.advanced.LockingDemo
+//   ./gradlew :04-hibernate-jpa:run -PmainClass=com.learning.blog.BlogApp
+application {
+    mainClass = providers.gradleProperty('mainClass')
+        .orElse('com.learning.blog.BlogApp')
+}
+
+// ── Source Sets ────────────────────────────────────────────────────────────
+// Explanation demos live in topic subdirectories so learners can read the
+// .md file and the .java demo side-by-side in one folder tree.
+// The mini-project has its own conventional src/main/java layout.
+sourceSets {
+    main {
+        java {
+            srcDirs = [
+                // Sub-topic explanation demos
+                '01-hibernate-basics/explanation',
+                '02-relationships/explanation',
+                '03-advanced-hibernate/explanation',
+                // Mini-project — conventional Maven layout
+                'mini-project-04-blog-hibernate/src/main/java'
+            ]
+        }
+    }
+}
+
+// ── Allow interactive stdin (used by some demos) ───────────────────────────
+tasks.named('run') {
+    standardInput = System.in
+}

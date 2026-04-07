@@ -1,0 +1,211 @@
+# Advanced Hibernate — Mind Map
+
+## Advanced Hibernate / JPA
+
+- **HQL / JPQL**
+    - WHY: query objects not tables — portable across databases
+    - HQL = Hibernate-specific (older), JPQL = JPA standard (prefer this)
+    - Both compile to database-specific SQL at runtime
+    - Syntax
+        - FROM uses Java class name, not table name: `FROM Product p`
+        - WHERE uses Java field name, not column name: `p.stockCount > 0`
+        - ORDER BY: `ORDER BY p.price ASC`
+        - GROUP BY with aggregates: `SELECT p.category, AVG(p.price) FROM Product p GROUP BY p.category`
+        - JOIN: `SELECT o FROM Order o JOIN o.items i WHERE i.product.id = :id`
+    - Parameters
+        - Named params (preferred): `:paramName` → `.setParameter("paramName", value)`
+        - Positional params (avoid in JPQL): `?1` → `.setParameter(1, value)`
+        - Python bridge: like SQLAlchemy `.filter(Product.price == bindparam("price"))`
+    - Pagination
+        - `.setFirstResult(offset)` — equivalent to SQL OFFSET
+        - `.setMaxResults(limit)` — equivalent to SQL LIMIT
+        - Always paginate — never load entire table into memory
+        - Python bridge: like `.limit(n).offset(m)` in SQLAlchemy
+    - `@NamedQuery`
+        - Defined on entity class with `@NamedQuery(name="...", query="...")`
+        - Validated and compiled at SessionFactory startup — errors surface early
+        - Referenced by name: `session.createNamedQuery("Product.findByCategory", Product.class)`
+        - Python bridge: like stored procedures in SQLAlchemy but for JPQL
+    - Projections
+        - SELECT specific fields instead of full entity: `SELECT p.id, p.name FROM Product p`
+        - Project into DTO: `SELECT new com.learning.dto.ProductDTO(p.id, p.name) FROM Product p`
+        - Java 21: use records as DTO targets
+        - Avoids over-fetching when only 2-3 fields needed from a wide table
+
+- **Criteria API**
+    - WHY: string-based JPQL fails at runtime if field name is mistyped — Criteria fails at compile time
+    - Essential for dynamic queries where filter combinations are not known at compile time
+    - Python bridge: like SQLAlchemy's `.filter()` chaining, but with Java compile-time safety
+    - Core building blocks
+        - `CriteriaBuilder cb` — factory for all query parts (from `session.getCriteriaBuilder()`)
+        - `CriteriaQuery<T> cq` — the query object (`cb.createQuery(Product.class)`)
+        - `Root<T> root` — the FROM clause, entry point to navigate fields (`cq.from(Product.class)`)
+        - `Predicate` — a WHERE clause condition (built with `cb`)
+        - `cb.equal(root.get("name"), value)` — equality
+        - `cb.greaterThanOrEqualTo(root.get("price"), minPrice)` — range
+        - `cb.like(root.get("name"), "%" + keyword + "%")` — text search
+        - `cb.and(pred1, pred2)` — combine predicates
+        - `cb.or(pred1, pred2)` — disjunction
+    - Dynamic query building
+        - Add predicates to a `List<Predicate>` only when filter value is non-null
+        - Convert to array: `cq.where(predicates.toArray(new Predicate[0]))`
+        - Avoids 12 if/else JPQL string concatenations
+    - Joins with Criteria API
+        - `Join<Product, Category> catJoin = root.join("category", JoinType.LEFT)`
+        - Navigate joined entity: `catJoin.get("name")`
+    - Metamodel
+        - `Product_` generated class provides `Product_.price` instead of `root.get("price")`
+        - Fully type-safe: compiler catches `Product_.pricee` typo immediately
+        - Generate with: Hibernate Metamodel Generator annotation processor
+    - When NOT to use Criteria API
+        - Simple single-filter queries → JPQL is more readable
+        - Use Criteria only when query structure changes at runtime
+
+- **Native SQL Queries**
+    - WHY: some queries require database-specific syntax JPQL cannot express (window functions, CTEs, LATERAL joins)
+    - `session.createNativeQuery("SELECT * FROM products WHERE ...", Product.class)`
+    - `@NamedNativeQuery` for named native SQL
+    - ResultTransformer: map raw results to DTOs not entities
+    - Risk: ties code to a specific database dialect — use sparingly
+    - Python bridge: like SQLAlchemy `session.execute(text("raw SQL"))`
+
+- **L1 Cache (First-Level Cache)**
+    - WHY: without it, `session.find(Product.class, 1L)` would hit the DB every time, even in the same method
+    - Scoped to a single Hibernate `Session` (one request/transaction lifecycle)
+    - Automatic — no configuration needed
+    - Identity map pattern: same PK = same Java object reference within the Session
+    - How it works
+        - First `session.find(Product.class, 1L)` → DB hit, result stored in L1 cache
+        - Second `session.find(Product.class, 1L)` → returns cached object, NO DB hit
+        - Two different Sessions → two DB hits (separate L1 caches)
+    - Management
+        - `session.evict(entity)` — remove one entity from L1 cache
+        - `session.clear()` — remove all entities from L1 cache
+        - `session.refresh(entity)` — force reload from DB, bypass L1 cache
+    - When L1 cache becomes a problem
+        - Long-running batch jobs: entity modified by another process, Session holds stale version
+        - Fix: use `session.clear()` periodically in batch loops, or use StatelessSession
+    - Python bridge: SQLAlchemy Session has same identity map behavior — same concept
+
+- **L2 Cache (Second-Level Cache)**
+    - WHY: L1 dies with the Session. L2 survives across requests — product categories loaded once, shared forever
+    - Scoped to `SessionFactory` — shared across all Sessions and threads
+    - Opt-in: must annotate entity AND configure a cache provider
+    - Requires external provider: Ehcache, Caffeine, Infinispan, Redis
+    - Configuration
+        - `@Cacheable` on entity class
+        - `@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)` for mutable data
+        - `@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)` for immutable reference data (fastest)
+        - `@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)` for rarely-changed data
+        - Enable in properties: `hibernate.cache.use_second_level_cache=true`
+    - Cache regions
+        - Each entity class gets its own cache region by default
+        - Custom region: `@Cache(region = "productRegion")`
+        - Allows per-region eviction policies
+    - When TO use L2 cache
+        - Reference data: countries, currencies, product categories, config tables
+        - User profiles (read-heavy, infrequently changed)
+        - Session cache: HTTP session data
+    - When NOT to use L2 cache
+        - Financial balances: stale data = incorrect business logic
+        - Inventory counts: stale data = overselling
+        - Anything updated by external processes outside Hibernate
+    - Python bridge: equivalent to `dogpile.cache` or `redis-py` for cross-request caching
+
+- **Query Cache**
+    - WHY: L2 caches entity objects by PK — but what about query results returning lists of IDs?
+    - Query cache stores the result set (list of PKs) of a specific JPQL query
+    - When query runs again with same parameters → return cached PKs → L2 cache fills entity data
+    - Enable: `hibernate.cache.use_query_cache=true` + `.setCacheable(true)` on query
+    - Invalidation: any insert/update/delete to queried entities invalidates the query cache
+    - Use only for queries against stable reference data
+    - Rarely beneficial for frequently-updated data — cache invalidated constantly
+
+- **Optimistic Locking**
+    - WHY: two users read the same product, both decrement stock, both save — first save is silently overwritten (lost update problem). Optimistic locking detects this without holding DB locks.
+    - High-throughput approach: read freely, detect conflict at write time
+    - Python bridge: like SQLAlchemy `__version_id_col__ = Column(Integer)`
+    - How it works
+        - Add `@Version private Integer version;` to entity
+        - Hibernate adds `WHERE id=? AND version=?` to every UPDATE
+        - If 0 rows updated (version changed by another transaction) → throws `OptimisticLockException`
+        - On success: Hibernate increments the version column automatically
+    - `@Version` field types
+        - `Integer` or `Long` — PREFERRED: monotonically increasing, no collision risk
+        - `Timestamp` — AVOID: millisecond resolution insufficient for high-throughput systems; two transactions in same millisecond both "win"
+    - Handling `OptimisticLockException`
+        - Retry: reload entity, re-apply changes, try again (good for automated processes)
+        - User-facing error: "Someone else modified this record, please refresh" (good for UI)
+        - Read-modify-write loop with max retries
+    - vs Pessimistic Locking
+        - Optimistic: high throughput, no DB locks held, must handle exceptions
+        - Pessimistic: guaranteed exclusive access, serializes writes, risk of deadlock
+    - Real-world: airline seat reservation, ticket booking, e-commerce inventory
+
+- **Pessimistic Locking**
+    - WHY: for high-value critical operations (bank transfer, final seat confirmation) "try and fail" is unacceptable — you need a guarantee before proceeding
+    - Holds a database-level lock for the transaction duration
+    - Python bridge: like SQLAlchemy `session.query(T).with_for_update()`
+    - Lock modes
+        - `LockModeType.PESSIMISTIC_READ` — shared lock: others can read, nobody can write
+        - `LockModeType.PESSIMISTIC_WRITE` — exclusive lock: nobody else can read OR write
+        - `PESSIMISTIC_WRITE` → generates `SELECT ... FOR UPDATE` in SQL
+    - Usage
+        - `session.find(Product.class, id, LockModeType.PESSIMISTIC_WRITE)`
+        - JPQL: `query.setLockMode(LockModeType.PESSIMISTIC_WRITE)`
+    - Lock timeout
+        - `@QueryHints({@QueryHint(name = "javax.persistence.lock.timeout", value = "5000")})`
+        - Always set a timeout — without it a deadlock hangs forever
+    - Deadlock risk
+        - Always acquire multiple locks in a consistent order (e.g., always lock accountA before accountB)
+        - Inconsistent ordering across transactions = deadlock
+    - When to use
+        - Bank transfers (both accounts must be locked)
+        - Final step of ticket/seat reservation
+        - Any operation where conflict cost exceeds throughput cost
+
+- **Inheritance Mapping**
+    - WHY: Java inheritance (is-a relationships) does not map cleanly to relational tables. Three strategies solve this with different tradeoffs — wrong choice causes either denormalized data, excessive JOINs, or broken polymorphic queries.
+    - Python bridge: like SQLAlchemy `__mapper_args__` with `polymorphic_on` and `polymorphic_identity`
+    - Strategy 1: `SINGLE_TABLE`
+        - All subclasses stored in one table
+        - Discriminator column (e.g., `DTYPE`) identifies the subclass
+        - `@Inheritance(strategy = InheritanceType.SINGLE_TABLE)`
+        - `@DiscriminatorColumn(name = "DTYPE")` on parent
+        - `@DiscriminatorValue("CREDIT_CARD")` on each subclass
+        - Pros: fast queries (no JOINs), simple schema, good polymorphic queries
+        - Cons: all subclass-specific columns are nullable; wide tables get confusing
+        - Choose when: hierarchy is shallow (2 levels), subclasses have few unique fields
+    - Strategy 2: `TABLE_PER_CLASS`
+        - One table per concrete class, each table has ALL fields (parent + own)
+        - `@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)`
+        - No discriminator column needed
+        - Pros: no nullable columns, simple direct queries
+        - Cons: polymorphic queries use UNION (slow), fields duplicated across tables
+        - Choose when: subclasses queried independently, polymorphic queries are rare
+    - Strategy 3: `JOINED`
+        - One table per class; subclass table has only its own fields + FK to parent table
+        - `@Inheritance(strategy = InheritanceType.JOINED)`
+        - `@PrimaryKeyJoinColumn` on subclass
+        - Pros: fully normalized, no nullable columns, clean schema
+        - Cons: every polymorphic query requires JOIN (costly for deep hierarchies)
+        - Choose when: hierarchy is deep, data integrity is critical, low query volume
+    - Comparison table
+        - SINGLE_TABLE: no JOIN, nullable columns, fast polymorphic queries
+        - TABLE_PER_CLASS: UNION for polymorphic, no nulls, independent queries fast
+        - JOINED: JOIN per level, no nulls, normalized — best for deep hierarchies
+    - Real-world examples
+        - Payment system (CreditCard/BankTransfer/Crypto): SINGLE_TABLE (shallow, few extra fields)
+        - CMS content types (Article/Video/Podcast): JOINED (rich unique fields per type)
+        - Product catalog (Book/Electronics/Clothing): TABLE_PER_CLASS (each type queried separately)
+
+- **Python SQLAlchemy Parallels**
+    - JPQL ↔ SQLAlchemy text() / ORM query
+    - Criteria API ↔ SQLAlchemy filter() chaining (but compile-time safe in Java)
+    - L1 cache ↔ SQLAlchemy Session identity map (same behavior)
+    - L2 cache ↔ dogpile.cache / redis-py (manual in Python, declarative in Java)
+    - @Version ↔ `__version_id_col__` on mapper
+    - with_for_update() ↔ LockModeType.PESSIMISTIC_WRITE
+    - SQLAlchemy concrete inheritance ↔ TABLE_PER_CLASS
+    - SQLAlchemy joined table inheritance ↔ JOINED
+    - SQLAlchemy single table inheritance ↔ SINGLE_TABLE

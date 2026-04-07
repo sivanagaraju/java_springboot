@@ -1,0 +1,169 @@
+# JPA Relationships — Mindmap
+
+- JPA Relationships
+  - @OneToOne
+    - Purpose
+      - Maps a single FK column between two entities
+      - Replaces manual JOIN queries in raw JDBC
+    - Owning side
+      - Holds the `@JoinColumn` annotation
+      - Hibernate writes the FK value here
+      - Example: `UserProfile` owns `user_id FK`
+    - Inverse side (mappedBy)
+      - `mappedBy = "profile"` on the User side
+      - No FK column on this side
+      - Must be kept in sync manually in code
+    - Key attributes
+      - `optional = false` — NOT NULL constraint on FK column
+      - `cascade` — propagate persist/merge/remove
+      - `fetch = FetchType.LAZY` — avoid loading full profile on every User load
+    - Bidirectional sync
+      - `user.setProfile(profile); profile.setUser(user);`
+      - Forgetting one side causes stale data in the same session
+    - Common mistakes
+      - FetchType.EAGER on a large profile entity
+      - Missing `@JoinColumn` — Hibernate generates an ugly column name
+      - Not setting both sides of bidirectional relationship
+  - @OneToMany / @ManyToOne
+    - Most common association in enterprise applications
+    - @ManyToOne (owning side)
+      - Holds the FK column (`@JoinColumn(name="department_id")`)
+      - Employee side in Department → Employee
+      - Default fetch: EAGER — override to LAZY for collections
+    - @OneToMany (inverse side)
+      - `mappedBy = "department"` on Department entity
+      - No FK column here — the child entity owns it
+      - Default fetch: LAZY — correct default, keep it
+    - Bidirectional sync helper
+      - Add `addEmployee(Employee e)` helper on Department
+      - Sets `e.setDepartment(this)` AND adds to `this.employees`
+      - Hibernate only reads the owning side when flushing
+    - `orphanRemoval = true`
+      - Deletes child row when removed from parent's collection
+      - Distinct from CascadeType.REMOVE (see cascade section)
+    - `CascadeType.ALL`
+      - Persisting Department automatically persists all Employees
+      - Safe here because Employees are fully owned by Department
+    - Common mistakes
+      - `@OneToMany` without `@ManyToOne` creates an unexpected join table
+      - Forgetting to sync both sides loses the child on flush
+      - Using EAGER on large collections — loads everything on parent load
+  - @ManyToMany
+    - Requires a join table at the database level — always
+    - Owning side
+      - Declares `@JoinTable(name, joinColumns, inverseJoinColumns)`
+      - Example: Student owns the `student_course` join table
+    - Inverse side
+      - `mappedBy = "courses"` on Course entity
+      - No `@JoinTable` here
+    - Always use Set, never List
+      - List causes Hibernate to delete all rows and re-insert on update
+      - Set uses individual DELETE/INSERT per element
+    - When to promote join table to entity
+      - Join table has extra columns (enrollment date, grade, status)
+      - Create `StudentCourse` entity with `@ManyToOne` on both sides
+      - Gives full control over lifecycle and extra fields
+    - Clearing relationships
+      - Must remove from both sides: `student.getCourses().remove(c); c.getStudents().remove(student);`
+    - Common mistakes
+      - Using List instead of Set — triggers full delete + re-insert
+      - CascadeType.ALL — would delete the shared Course entity
+      - Bidirectional without clearing both sides — orphan join rows
+    - Python bridge
+      - SQLAlchemy `secondary=` table maps to `@JoinTable`
+      - SQLAlchemy `association_proxy` maps to a promoted join entity
+  - Cascade Types
+    - CascadeType.PERSIST
+      - When parent is persisted, unsaved children are also persisted
+      - Safe to use on @OneToMany with fully owned children
+    - CascadeType.MERGE
+      - When parent is merged (updated), detached children are also merged
+      - Use with PERSIST together for full save/update propagation
+    - CascadeType.REMOVE
+      - When parent is deleted, all children are also deleted
+      - Dangerous on @ManyToMany — would delete shared entities
+    - CascadeType.REFRESH
+      - Propagates EntityManager.refresh() to children
+      - Rarely needed explicitly
+    - CascadeType.DETACH
+      - Propagates EntityManager.detach() to children
+      - Rarely needed explicitly
+    - CascadeType.ALL
+      - Shorthand for all six cascade types
+      - Safe only on @OneToMany where parent fully owns children
+      - NEVER use on @ManyToMany
+    - orphanRemoval vs CascadeType.REMOVE
+      - `orphanRemoval=true`: child deleted when *removed from parent's collection*
+      - `CascadeType.REMOVE`: child deleted when *parent entity is deleted*
+      - You usually want both together for fully owned children
+    - Python bridge
+      - SQLAlchemy `cascade="all, delete-orphan"` = CascadeType.ALL + orphanRemoval=true
+      - SQLAlchemy `cascade="save-update, merge"` = CascadeType.PERSIST + MERGE
+  - Fetch Strategies
+    - FetchType.LAZY (default for @OneToMany, @ManyToMany)
+      - Hibernate returns a proxy object
+      - Actual SQL runs only when collection is accessed
+      - Preferred — avoids loading data you don't need
+    - FetchType.EAGER (default for @ManyToOne, @OneToOne)
+      - Hibernate JOINs the related table in the same query
+      - Fine for small, always-needed references (e.g., parent entity)
+      - Dangerous on collections — loads everything globally
+    - Default fetch types (memorise these)
+      - @OneToOne — EAGER (override to LAZY when profile is large)
+      - @ManyToOne — EAGER (usually acceptable — it's a single row)
+      - @OneToMany — LAZY (correct, never change to EAGER)
+      - @ManyToMany — LAZY (correct, never change to EAGER)
+    - LazyInitializationException
+      - Occurs when lazy collection accessed outside Hibernate session
+      - Root cause: session closed before data was loaded
+      - Fix 1: JOIN FETCH in JPQL
+      - Fix 2: @EntityGraph on repository method
+      - Fix 3: @Transactional on service method (extends session boundary)
+      - Anti-pattern fix: Open Session in View — hides the real problem
+    - @EntityGraph
+      - `@EntityGraph(attributePaths = {"comments", "tags"})`
+      - Applied to Spring Data repository method
+      - Generates a JOIN for named paths in that specific query only
+    - Python bridge
+      - SQLAlchemy `lazy="select"` = FetchType.LAZY
+      - SQLAlchemy `lazy="joined"` = FetchType.EAGER
+      - SQLAlchemy `lazy="dynamic"` = Hibernate's extra-lazy (rare)
+      - SQLAlchemy `options(selectinload(...))` = @EntityGraph
+  - N+1 Problem
+    - What it is
+      - 1 query loads N parent entities
+      - Then N individual queries load each parent's child collection
+      - Total: N+1 queries instead of 1
+    - How to detect
+      - Enable `spring.jpa.show-sql=true` in application.properties
+      - Enable Hibernate statistics: `spring.jpa.properties.hibernate.generate_statistics=true`
+      - Count repeated `SELECT ... WHERE parent_id = ?` queries
+      - Use a query counter interceptor in tests
+    - Fix 1: JOIN FETCH in JPQL
+      - `SELECT o FROM Order o JOIN FETCH o.items`
+      - Single query with JOIN — always 1 query regardless of N
+      - Best for: single query in a repository method
+      - Watch out: can produce duplicate parent rows — use DISTINCT
+    - Fix 2: @EntityGraph
+      - `@EntityGraph(attributePaths = {"items"})`
+      - Applied to a Spring Data repository method annotation
+      - Generated SQL is a JOIN FETCH equivalent
+      - Best for: Spring Data repositories, clean API
+    - Fix 3: @BatchSize
+      - `@BatchSize(size = 25)` on the collection field
+      - Hibernate uses `SELECT ... WHERE parent_id IN (id1, id2, ..., id25)`
+      - Reduces N+1 to ceil(N/batch_size) + 1 queries
+      - Best for: when JOIN FETCH causes too-wide result sets (N x M rows)
+    - When to use each fix
+      - Small collection, must-have data: JOIN FETCH or @EntityGraph
+      - Large N, moderate collection: @BatchSize
+      - Already a Spring Data method: @EntityGraph is cleanest
+    - Anti-patterns
+      - FetchType.EAGER to "fix" N+1 — global, loads even when not needed
+      - 2nd-level cache to hide N+1 — cache miss = catastrophe
+      - Not measuring query count — ships to production silently
+    - Python bridge
+      - SQLAlchemy `selectinload()` ≈ @EntityGraph / JOIN FETCH
+      - SQLAlchemy `joinedload()` ≈ JOIN FETCH
+      - SQLAlchemy `subqueryload()` ≈ @BatchSize (subquery strategy)
+      - `session.execute(select(Author).options(selectinload(Author.books)))`
