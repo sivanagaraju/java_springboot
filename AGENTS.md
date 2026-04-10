@@ -15,6 +15,7 @@ This file provides overarching system context to ensure all AI agents maintain c
 4.  **Python Mastery Bridge:** All documentation must compare Java concepts to Python/FastAPI equivalents to aid learning.
 5.  **4-Layer Commenting:** Every Java file must have File Header, Class description, Method contracts, and minimal inline comments.
 6.  **3 Content Standards:** Every `.md` file must include Mermaid diagrams. Every module needs a `MINDMAP.md` (Markmap format). Every explanation file ends with Interview Questions.
+7.  **Resources Support Pack:** Every sub-topic with 3+ explanation files must have a `resources/` folder containing: `one-page-cheat-sheet.md`, `progressive-quiz-drill.md` (4 rounds), `top-resource-guide.md` (external links + concepts checklist). Reference: `04-hibernate-jpa/01-hibernate-basics/resources/`.
 
 ## 📂 Active Layers (Spring Boot Architecture)
 - **Controller:** REST API endpoints in `/controller` (`@RestController`).

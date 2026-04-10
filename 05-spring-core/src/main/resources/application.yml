@@ -1,0 +1,49 @@
+# ╔═══════════════════════════════════════════════════════════════════╗
+# ║  MODULE : 05-spring-core                                          ║
+# ║  PURPOSE : Spring Boot configuration for IoC/DI/Lifecycle demos   ║
+# ║  PROFILES: dev (default), prod, test                              ║
+# ╠═══════════════════════════════════════════════════════════════════╣
+# ║  Python equivalent:                                                ║
+# ║    .env file + python-decouple / pydantic Settings                 ║
+# ║    Spring: YAML config with profile-based overrides                ║
+# ╚═══════════════════════════════════════════════════════════════════╝
+
+spring:
+  application:
+    name: spring-core-learning
+
+  # Allow multiple @SpringBootApplication classes in explanation demos
+  main:
+    allow-bean-definition-overriding: true
+
+  # Default profile — H2 in-memory, verbose logging
+  profiles:
+    active: default
+
+# Feature flags for ConditionalBeanDemo
+app:
+  feature:
+    analytics:
+      enabled: false
+
+---
+# ── Dev Profile ──────────────────────────────────────────────────────
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    com.learning: DEBUG
+
+---
+# ── Prod Profile ─────────────────────────────────────────────────────
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    com.learning: WARN

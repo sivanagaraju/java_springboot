@@ -1,0 +1,52 @@
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║  MODULE : 05-spring-core                                          ║
+// ║  PURPOSE : Spring IoC container, DI, Bean lifecycle, Events       ║
+// ║  RUN     : ./gradlew :05-spring-core:bootRun                     ║
+// ║  TEST    : ./gradlew :05-spring-core:test                        ║
+// ╠═══════════════════════════════════════════════════════════════════╣
+// ║                                                                    ║
+// ║  Dependencies:                                                     ║
+// ║   spring-boot-starter  ← Core Spring (IoC, DI, context)          ║
+// ║   spring-boot-devtools ← Auto-restart on code change              ║
+// ║   lombok               ← Reduce boilerplate (@Slf4j, @Data)      ║
+// ║   spring-boot-starter-test ← JUnit 5 + Mockito + Spring Test     ║
+// ║                                                                    ║
+// ║  Python equivalent:                                                ║
+// ║    pip install fastapi uvicorn                                     ║
+// ║    → Spring Boot starter = FastAPI + Uvicorn + DI bundled         ║
+// ╚═══════════════════════════════════════════════════════════════════╝
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+sourceCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Core — IoC container, DI, bean lifecycle, events
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // DevTools — auto-restart on code change (dev only)
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Lombok — reduce boilerplate (@Slf4j, @RequiredArgsConstructor)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Testing — JUnit 5 + Mockito + Spring Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

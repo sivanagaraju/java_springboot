@@ -21,3 +21,6 @@ include '03-jdbc:mini-project-03-employee-jdbc'
 
 // ── Module 04: Hibernate / JPA ─────────────────────────────────────
 include '04-hibernate-jpa'
+
+// ── Module 05: Spring Core ─────────────────────────────────────────
+include '05-spring-core'

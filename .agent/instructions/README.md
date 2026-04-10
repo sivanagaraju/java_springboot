@@ -72,21 +72,26 @@ Questions must be scenario-based, not definitional. "What is @Transactional?" is
 
 ---
 
-## Sub-topic Support Pack
+## Sub-topic Support Pack (MANDATORY — Standard 5)
 
-When a module is substantially deepened, create a support pack in the specific
-sub-topic folder that was expanded, for example `03-advanced-oop/resources/`:
+> **This is NOT optional.** Every sub-topic folder with 3+ explanation files MUST have a
+> `resources/` directory with exactly 3 files. This is as mandatory as Mermaid diagrams
+> and Interview Questions.
 
-- `resources/progressive-quiz-drill.md`
-- `resources/one-page-cheat-sheet.md`
-- `resources/top-resource-guide.md`
+**Required structure:** Every `XX-sub-topic/resources/` directory must contain:
 
-Use the support pack for larger explanation sets, phase work, or any deep
-sub-topic that adds enough depth to need revision, recall, and study aids. Keep
-each file concise and aligned to the sub-topic topic. `top-resource-guide.md`
-must be a curated list of external learning resources only: books, official docs,
-blogs, and videos. Do not use internal repo links as the primary content of that
-file.
+| File | Purpose | Required Sections |
+|---|---|---|
+| `one-page-cheat-sheet.md` | Dense quick-reference for revision | Annotation/concept table, ASCII diagrams, `## Python → Java Quick Map`, `## 5 Traps to Avoid` |
+| `progressive-quiz-drill.md` | Self-assessment with increasing difficulty | Exactly **4 rounds**: Round 1 — Core Recall (8 Q), Round 2 — Apply & Compare (3 Q), Round 3 — Debug the Bug (3 scenarios), Round 4 — Staff-Level (2 Q). Each round has an Answer Key. |
+| `top-resource-guide.md` | Curated external learning resources ONLY | `## Official Documentation`, `## Books`, `## Blogs — Highest Signal`, `## Videos`, `## Concepts Checklist` (checkboxes for self-assessment before next sub-topic) |
+
+**Rules:**
+- `top-resource-guide.md` must contain ONLY external links — no internal repo links
+- `progressive-quiz-drill.md` Round 2 must include Python↔Java translation exercises
+- `progressive-quiz-drill.md` Round 3 must be scenario-based debugging (not definition questions)
+- `one-page-cheat-sheet.md` must fit conceptually on one printed page (dense, no fluff)
+- **Reference implementation:** `04-hibernate-jpa/01-hibernate-basics/resources/`
 
 ## Java Commenting Standard (mandatory for every .java file)
 
