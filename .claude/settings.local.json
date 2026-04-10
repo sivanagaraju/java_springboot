@@ -7,7 +7,14 @@
       "Read(//c/Users/sivan/Learning/Code/java_springboot/.agent/skills/$skill/**)",
       "Bash(done)",
       "Bash(else echo:*)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(cmd /c \"gradlew.bat :04-hibernate-jpa:compileJava 2>&1\")",
+      "Bash(./gradlew.bat \":04-hibernate-jpa:compileJava\")",
+      "Bash(ls \"C:\\\\Users\\\\sivan\\\\Learning\\\\Code\\\\java_springboot\"/*.bat)",
+      "Bash(ls \"C:\\\\Users\\\\sivan\\\\Learning\\\\Code\\\\java_springboot\"/gradlew*)",
+      "Bash(gradle --version)",
+      "Bash(ls /c/ProgramData/chocolatey/bin/gradle*)",
+      "Bash(ls /c/Users/sivan/.gradle/wrapper/dists/gradle-9.2.0-bin/*/gradle-9.2.0/bin/)"
     ]
   }
 }
